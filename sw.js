@@ -1,5 +1,5 @@
 // Καουροημερολόγιο - service worker: κρατά την εφαρμογή διαθέσιμη χωρίς ίντερνετ
-var CACHE = "kaoura-v32";
+var CACHE = "kaoura-v33";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "fb.js", "badge-96.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
@@ -24,8 +24,8 @@ self.addEventListener("push", function (e) {
   var p = {}; try { p = e.data ? e.data.json() : {}; } catch (x) {}
   var d = p.data || p;
   if (d.kind === "quote") {
-    e.waitUntil(self.registration.showNotification(d.body || "", {
-      body: "", icon: "icon-192.png", badge: "badge-96.png", tag: "kaoura-quote", data: { kind: "quote" }
+    e.waitUntil(self.registration.showNotification(d.title || d.body || "", {
+      body: d.title ? (d.body || "") : "", icon: "icon-192.png", badge: "badge-96.png", tag: "kaoura-quote", data: { kind: "quote" }
     }));
     return;
   }
