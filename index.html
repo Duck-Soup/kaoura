@@ -117,13 +117,48 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 .lnk.mut{color:var(--muted);font-weight:600}
 .err{color:var(--accent);font-size:.86rem;min-height:1.2em;margin:8px 0 0}
 .opt.sm{font-size:.82rem;padding:7px 12px}
+/* άνοιγμα */
+#splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,#14a3a6,#7a2a8c 55%,#c2187a);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;animation:spOut .45s ease-in 2.1s forwards}
+#splash.skip{animation:spOut .2s ease-in forwards}
+#splash .lg{width:110px;height:110px;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:spPop .7s cubic-bezier(.2,1.6,.4,1) both;position:relative;z-index:2}
+#splash h1{color:#fff;font-size:1.5rem;margin:18px 0 0;opacity:0;animation:spFade .5s ease .8s forwards;position:relative;z-index:2}
+#splash .burst{position:absolute;left:50%;top:46%;width:0;height:0}
+#splash .pill{position:absolute;width:30px;height:30px;margin:-15px;border-radius:50%;opacity:0;animation:spFly 1.25s cubic-bezier(.15,.8,.3,1) calc(.35s + var(--d)) forwards;box-shadow:0 3px 6px rgba(0,0,0,.25),inset 0 -3px 0 rgba(0,0,0,.08)}
+#splash .pw{background:linear-gradient(180deg,#f06aa8 0 50%,#fdfcfd 50% 100%)}
+#splash .p{background:radial-gradient(circle at 35% 30%,#ffc1dd,#e9579b 70%)}
+#splash .w{background:radial-gradient(circle at 35% 30%,#fff,#e8e4ea 70%)}
+@keyframes spPop{0%{transform:scale(.2);opacity:0}100%{transform:scale(1);opacity:1}}
+@keyframes spFade{to{opacity:1}}
+@keyframes spFly{0%{opacity:1;transform:translate(0,0) rotate(0) scale(.3)}70%{opacity:1}100%{opacity:0;transform:translate(var(--x),calc(var(--y) + 120px)) rotate(var(--r)) scale(var(--s))}}
+@keyframes spOut{to{opacity:0;transform:scale(1.08);visibility:hidden}}
+/* αρχική */
+.back{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.4rem;line-height:1;cursor:pointer;flex:none;padding:0 0 3px}
+.hello{color:var(--muted);margin:0 2px 8px;font-size:.95rem}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+.tile{background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:16px;min-height:118px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-start;text-align:left;color:var(--ink);font:inherit;cursor:pointer;transition:transform .12s}
+.tile:active{transform:scale(.97)}
+.tile.big{grid-column:1/-1;flex-direction:row;align-items:center;justify-content:flex-start;gap:14px;min-height:92px}
+.tile .ic{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:rgba(20,163,166,.14);color:var(--leaf);flex:none}
+.tile.big .ic{background:var(--grad);color:#fff;width:52px;height:52px}
+.tile b{font-size:1.02rem;display:block}.tile span{color:var(--muted);font-size:.82rem;display:block;margin-top:2px}
+.tile .chev{margin-left:auto;color:var(--muted);font-size:1.5rem}
 .cancel{background:none;color:var(--muted);flex:0 0 auto!important;padding:13px 10px!important}
 </style>
 </head>
 <body>
+<div id="splash" aria-hidden="true"><div class="burst"><i class="pill pw" style="--x:166px;--y:-11px;--r:-392deg;--d:137ms;--s:0.84"></i><i class="pill pw" style="--x:227px;--y:103px;--r:-464deg;--d:22ms;--s:1.00"></i><i class="pill w" style="--x:130px;--y:92px;--r:-419deg;--d:144ms;--s:0.86"></i><i class="pill pw" style="--x:105px;--y:191px;--r:272deg;--d:12ms;--s:1.24"></i><i class="pill p" style="--x:44px;--y:240px;--r:318deg;--d:36ms;--s:1.04"></i><i class="pill pw" style="--x:-86px;--y:193px;--r:-329deg;--d:148ms;--s:1.06"></i><i class="pill pw" style="--x:-98px;--y:126px;--r:-418deg;--d:158ms;--s:0.89"></i><i class="pill p" style="--x:-186px;--y:62px;--r:413deg;--d:149ms;--s:1.22"></i><i class="pill pw" style="--x:-177px;--y:9px;--r:-41deg;--d:20ms;--s:1.06"></i><i class="pill w" style="--x:-226px;--y:-96px;--r:49deg;--d:155ms;--s:1.24"></i><i class="pill p" style="--x:-158px;--y:-115px;--r:-229deg;--d:125ms;--s:0.99"></i><i class="pill p" style="--x:-32px;--y:-155px;--r:156deg;--d:177ms;--s:0.96"></i><i class="pill pw" style="--x:0px;--y:-237px;--r:-349deg;--d:69ms;--s:1.01"></i><i class="pill p" style="--x:69px;--y:-140px;--r:372deg;--d:72ms;--s:1.12"></i><i class="pill w" style="--x:151px;--y:-110px;--r:187deg;--d:43ms;--s:1.07"></i><i class="pill p" style="--x:160px;--y:-66px;--r:-276deg;--d:63ms;--s:0.98"></i></div><img class="lg" src="icon-192.png" alt=""><h1>Καουροημερολόγιο</h1></div>
 <main>
-<div class="brand"><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1>Καουροημερολόγιο</h1></div></div>
+<div class="brand"><button class="back" id="back" type="button" aria-label="Πίσω" hidden>‹</button><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1 id="ptitle">Καουροημερολόγιο</h1></div></div>
+<section id="v-home">
+<p class="hello" id="hello"></p>
 <div class="quote" role="note"><small>Η φράση της ημέρας</small><p id="tag"></p></div>
+<div class="tiles">
+<button class="tile big" id="go-cal" type="button"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span><b>Ημερολόγιο</b><span>Δες και σημείωσε τις μέρες σου</span></span><span class="chev">›</span></button>
+<button class="tile" id="go-sum" type="button"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span><b>Απολογισμός</b><span>Ο μήνας με μια ματιά</span></span></button>
+<button class="tile" id="go-set" type="button"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span><span><b>Ρυθμίσεις</b><span>Υπενθύμιση, λογαριασμός</span></span></button>
+</div>
+</section>
+<div id="calwrap">
 <div class="tabs" role="tablist">
 <button role="tab" id="t-cal" aria-selected="true">Ημερολόγιο</button>
 <button role="tab" id="t-sum" aria-selected="false">Απολογισμός</button>
@@ -139,7 +174,14 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <div class="grid" id="days" style="margin-top:6px"></div>
 <div class="legend"><span><i style="background:var(--s1)"></i>Ήπια</span><span><i style="background:var(--s2)"></i>Μέτρια</span><span><i style="background:var(--s3)"></i>Έντονη</span><span><i style="border:2px dashed var(--accent);box-sizing:border-box"></i>Μόνο συμπτώματα</span></div>
 <p class="hint">Πάτα μια μέρα για να καταχωρίσεις καούρα ή συμπτώματα. Οι μέρες χωρίς χρώμα μετράνε ως μέρες χωρίς καούρα.</p>
-<div class="card set" style="margin-top:16px">
+</section>
+<section id="v-sum" hidden></section>
+</div>
+<section id="v-set" hidden>
+<h2 style="font-size:.85rem;color:var(--muted);margin:2px 2px 8px">Λογαριασμός</h2>
+<button class="acct" id="acct" type="button" style="margin:0 0 10px"></button>
+<label class="field" style="margin:0 0 16px"><span>Το όνομά σου (για τις φράσεις της ημέρας)</span><input id="set-name" maxlength="30" autocomplete="given-name" placeholder="π.χ. Ολυμπία"></label>
+<div class="card set">
 <h2>Υπενθύμιση</h2>
 <div style="display:flex;align-items:center;gap:10px"><label style="margin:0;flex:1"><input type="checkbox" id="rem-on"> Ειδοποίηση κάθε μέρα στις</label><input type="time" id="rem-time" style="flex:none"></div>
 <p class="sub" id="nt-st" style="margin:10px 0 0"></p>
@@ -151,9 +193,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <p class="sub" id="inst-done" hidden style="margin:0 0 6px">Η εφαρμογή είναι εγκατεστημένη.</p>
 <p class="sub" style="margin:0">Στο Chrome: μενού ⋮ και μετά «Προσθήκη στην αρχική οθόνη» (ή «Εγκατάσταση εφαρμογής»). Θα ανοίγει σαν κανονική εφαρμογή, με το λογότυπο.</p>
 </div>
-<button class="acct" id="acct" type="button"></button>
 </section>
-<section id="v-sum" hidden></section>
 </main>
 
 <div class="toast" id="toast" role="status"></div>
@@ -163,6 +203,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <h2 id="lg-title">Σύνδεση</h2>
 <p class="sub" id="lg-sub" style="margin:0">Για να μη χαθεί ποτέ το ημερολόγιό σου.</p>
 <input id="lg-email" type="email" placeholder="Email" autocomplete="email" autocapitalize="off" spellcheck="false">
+<input id="lg-name" placeholder="Όνομα (π.χ. Ολυμπία)" autocomplete="given-name" maxlength="30" hidden>
 <input id="lg-pass" type="password" placeholder="Κωδικός" autocomplete="current-password">
 <p class="err" id="lg-err" role="alert"></p>
 <button class="save" id="lg-go" type="button">Σύνδεση</button>
@@ -239,7 +280,7 @@ try{var raw=localStorage.getItem(KEY);if(raw)data=JSON.parse(raw)||{};}catch(e){
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(DELK,JSON.stringify(dels));}catch(e){}if(window.syncSchedule)syncSchedule();}
 var now=new Date();
 var cur={y:now.getFullYear(),m:now.getMonth()};
-var view="cal",editing=null,form={s:null,t:[],y:[]};
+var view="home",editing=null,form={s:null,t:[],y:[]};
 var SEVB=["Καθόλου","Ήπια","Μέτρια","Έντονη"];
 function pad(n){return n<10?"0"+n:""+n}
 function ds(y,m,d){return y+"-"+pad(m+1)+"-"+pad(d)}
@@ -250,6 +291,11 @@ function $(id){return document.getElementById(id)}
 $("dows").innerHTML=DOW.map(function(d){return '<div class="dow">'+d+'</div>'}).join("");
 
 function render(){
+  var home=view==="home",calish=view==="cal"||view==="sum";
+  $("v-home").hidden=!home;$("calwrap").hidden=!calish;$("v-set").hidden=view!=="set";
+  $("back").hidden=home;$("ptitle").textContent=view==="set"?"Ρυθμίσεις":"Καουροημερολόγιο";
+  if(home){renderHome();return;}
+  if(!calish)return;
   $("title").textContent=MONTHS[cur.m]+" "+cur.y;
   $("v-cal").hidden=view!=="cal";
   $("v-sum").hidden=view!=="sum";
@@ -258,13 +304,26 @@ function render(){
   if(view==="cal")renderCal();else renderSum();
   renderBanner();
 }
+function renderHome(){
+  var n=new Date(),h=n.getHours(),g=h>=5&&h<13?"Καλημέρα!":h<21&&h>=13?"Καλησπέρα!":"Καληνύχτα!",d="";
+  try{d=n.toLocaleDateString("el-GR",{weekday:"long",day:"numeric",month:"long"});}catch(e){}
+  var nm=(cfg.name||"").trim();if(nm)g=g.replace("!",", "+voc(nm)+"!");
+  $("hello").textContent=g+" "+d.charAt(0).toUpperCase()+d.slice(1);
+}
+// πλοήγηση: αρχική ↔ σελίδες, με το κουμπί «πίσω» του κινητού
+function go(v){
+  if(v===view)return;
+  var fromHome=view==="home";view=v;window.scrollTo(0,0);render();
+  try{if(v==="home"){if(history.state&&history.state.page)history.back();}
+    else if(fromHome)history.pushState({page:v},"");else history.replaceState({page:v},"");}catch(e){}
+}
 function todayKey(){var n=new Date();return ds(n.getFullYear(),n.getMonth(),n.getDate())}
 function renderBanner(){
   var b=$("banner"),n=new Date(),k=todayKey();
   var hm=pad(n.getHours())+":"+pad(n.getMinutes());
-  if(!cfg.rem.on||data[k]||cfg.ok[k]||hm<cfg.rem.time){b.innerHTML="";return;}
+  if(view!=="cal"||!cfg.rem.on||data[k]||cfg.ok[k]||hm<cfg.rem.time){b.innerHTML="";return;}
   b.innerHTML='<div class="banner" role="status"><p>Είχες καούρα σήμερα;</p><div class="row"><button id="b-yes">Ναι, καταχώριση</button><button id="b-no">Όχι, καμία</button></div></div>';
-  $("b-yes").onclick=function(){now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};view="cal";render();openSheet(now.getDate());};
+  $("b-yes").onclick=function(){now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};go("cal");openSheet(now.getDate());};
   $("b-no").onclick=function(){cfg.ok[k]=1;saveCfg();renderBanner();toast("Τέλεια, μια ήρεμη μέρα!");};
 }
 function calLink(){}
@@ -274,41 +333,74 @@ $("rem-time").onchange=function(){if(this.value){cfg.rem.time=this.value;saveCfg
 setInterval(renderBanner,60000);
 function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("show")},3200);}
 var PH=[
-"Ολυμπία, το Gaviscon είναι εδώ για σένα.",
-"Η φλόγα της Ολυμπίας σβήνει με Gaviscon.",
+"{n}, το Gaviscon είναι εδώ για σένα.",
+"{G}",
 "Μία μέρα τη φορά. Το Gaviscon είναι δίπλα σου.",
-"Καλημέρα Ολυμπία! Σήμερα θα είναι μια ήρεμη μέρα.",
+"Καλημέρα {n}! Σήμερα θα είναι μια ήρεμη μέρα.",
 "Μικρά γεύματα, μεγάλη ησυχία.",
 "Η καούρα περνάει. Το Gaviscon είναι εδώ.",
 "Το σώμα σου μιλάει. Εσύ το ακούς.",
 "Η φλόγα ανήκει στους Ολυμπιακούς Αγώνες, όχι στο στομάχι σου.",
 "Κάθε μέρα χωρίς καούρα είναι μια μικρή νίκη.",
 "Σημείωσε, δες το μοτίβο, φρόντισε τον εαυτό σου.",
-"Ολυμπία, αξίζεις μια μέρα χωρίς φωτιά.",
+"{n}, αξίζεις μια μέρα χωρίς φωτιά.",
 "Λίγη βόλτα μετά το φαγητό, και το στομάχι λέει ευχαριστώ.",
 "Δεν χρειάζεται να είναι τέλεια μέρα. Αρκεί να είναι ήρεμη.",
 "Όταν η μέρα δεν πάει καλά, το Gaviscon είναι εκεί για σένα.",
 "Ο καφές μπορεί να περιμένει λίγο. Εσύ όχι.",
 "Ανάσα βαθιά. Το στρες βαραίνει και το στομάχι.",
-"Ολυμπία, το Gaviscon σε προσέχει όταν εσύ ξεχνάς.",
+"{n}, το Gaviscon σε προσέχει όταν εσύ ξεχνάς.",
 "Ό,τι κι αν έγινε χθες, σήμερα είναι νέα μέρα.",
 "Το βραδινό λίγο νωρίτερα, η νύχτα πιο ήσυχη.",
 "Σήμερα αποφασίζεις εσύ, όχι η καούρα.",
 "Ένα μασώμενο δισκίο, και πάμε παρακάτω.",
 "Μην ξεχάσεις: το Gaviscon είναι στην τσάντα σου.",
 "Κάθε καταχώριση σε βοηθά να καταλάβεις τι σου φταίει.",
-"Ολυμπία, είσαι πιο δυνατή από κάθε καούρα.",
+"{S}",
 "Λιγότερα πικάντικα, περισσότερα χαμόγελα.",
 "Αν σήμερα δυσκολεύει, αύριο θα είναι καλύτερα.",
 "Τρώγε αργά και απόλαυσε κάθε μπουκιά.",
 "Το μαξιλάρι λίγο ψηλότερα, ο ύπνος λίγο πιο γλυκός.",
 "Κράτα το ημερολόγιο, και το μοτίβο θα φανεί.",
 "Ήπια, μέτρια ή καθόλου: όλα μετράνε.",
-"Ολυμπία, σήμερα το στομάχι σου κάνει διάλειμμα."];
+"{n}, σήμερα το στομάχι σου κάνει διάλειμμα."];
 // Αλλάζει κάθε μέρα στις 00:00 (τοπική ώρα)
 function dayNum(){var n=new Date();return Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/864e5)}
 var lastQ=-1;
-function renderQuote(){var d=dayNum();if(d===lastQ)return;lastQ=d;$("tag").textContent=PH[d%PH.length];}
+// ---- Κλίση ονόματος: Χρήστος → Χρήστο / του Χρήστου, Ολυμπία → της Ολυμπίας ----
+var GV="αεηιουωάέήίόύώϊϋΐΰ",ACC={"α":"ά","ε":"έ","η":"ή","ι":"ί","ο":"ό","υ":"ύ","ω":"ώ"},UNACC={"ά":"α","έ":"ε","ή":"η","ί":"ι","ό":"ο","ύ":"υ","ώ":"ω"};
+function vgroups(w){var g=[],i=0,lw=w.toLowerCase();
+  while(i<lw.length){if(GV.indexOf(lw[i])<0){i++;continue;}
+    var j=i+1,pair=lw.slice(i,i+2).replace(/[άέήίόύώ]/g,function(c){return UNACC[c]});
+    if(/^(αι|ει|οι|ου|υι)$/.test(pair)&&!/[ϊϋ]/.test(lw[i+1]||""))j=i+2;
+    g.push([i,j]);i=j;}
+  return g;}
+function accPos(w){var g=vgroups(w);for(var k=g.length-1;k>=0;k--){if(/[άέήίόύώΐΰ]/.test(w.slice(g[k][0],g[k][1]).toLowerCase()))return g.length-1-k;}return -1;}
+function shiftAcc(w){var g=vgroups(w),k=-1;
+  for(var i=0;i<g.length;i++)if(/[άέήίόύώ]/.test(w.slice(g[i][0],g[i][1]).toLowerCase()))k=i;
+  if(k<0||k+1>=g.length)return w;
+  var a=w.split("");for(var x=g[k][0];x<g[k][1];x++){var c=a[x].toLowerCase();if(UNACC[c])a[x]=a[x]===c?UNACC[c]:UNACC[c].toUpperCase();}
+  var t=g[k+1][1]-1;var c2=a[t].toLowerCase();if(ACC[c2])a[t]=a[t]===c2?ACC[c2]:ACC[c2].toUpperCase();
+  return a.join("");}
+function nameInfo(n){
+  var w=String(n||"").trim().split(/\s+/)[0]||"",l=w.toLowerCase(),o={name:w,voc:w,gen:"",male:null};
+  if(!w)return o;
+  if(/ος$/.test(l)){o.male=true;var st=w.slice(0,-2),pr=accPos(w)>=2;o.voc=st+(pr?"ε":"ο");o.gen=(pr?shiftAcc(st+"ο"):st)+(pr?"υ":"ου");if(pr)o.gen=shiftAcc(st+"ου").replace(/ούυ$/,"ού");}
+  else if(/ός$/.test(l)){o.male=true;o.voc=w.slice(0,-2)+"έ";o.gen=w.slice(0,-2)+"ού";}
+  else if(/[αάηήιί]ς$/.test(l)){o.male=true;o.voc=w.slice(0,-1);o.gen=w.slice(0,-1);}
+  else if(/(ου|ού)$/.test(l)){o.male=false;o.gen=w+"ς";}
+  else if(/[αάηήωώ]$/.test(l)){o.male=false;o.gen=w+"ς";}
+  return o;}
+function voc(n){return nameInfo(n).voc}
+function phrase(t){
+  var nm=(cfg.name||"").trim(),ni=nameInfo(nm),known=!!nm&&ni.male!==null;
+  if(t==="{G}")return known?"Η φλόγα "+(ni.male?"του ":"της ")+ni.gen+" σβήνει με Gaviscon.":"Η φλόγα της καούρας σβήνει με Gaviscon.";
+  if(t==="{S}")return known?ni.voc+", είσαι πιο "+(ni.male?"δυνατός":"δυνατή")+" από κάθε καούρα.":(nm?ni.voc+", καμία καούρα δεν σε σταματά.":"Καμία καούρα δεν σε σταματά.");
+  if(nm)return t.replace("{n}",ni.voc);
+  t=t.replace(" {n}!","!").replace(/^\{n\}, /,"");
+  return t.charAt(0).toUpperCase()+t.slice(1);
+}
+function renderQuote(force){var d=dayNum();if(d===lastQ&&!force)return;lastQ=d;$("tag").textContent=phrase(PH[d%PH.length]);}
 renderQuote();setInterval(renderQuote,60000);
 document.addEventListener("visibilitychange",function(){if(!document.hidden){renderQuote();renderBanner();}});
 function renderCal(){
@@ -455,8 +547,12 @@ function renderSum(){
 function bar(l,v,max){return '<div class="bar"><span>'+l+'</span><span class="track"><i style="width:'+Math.round(v/max*100)+'%"></i></span><span>'+v+'</span></div>'}
 $("prev").onclick=function(){cur.m--;if(cur.m<0){cur.m=11;cur.y--}render()};
 $("next").onclick=function(){cur.m++;if(cur.m>11){cur.m=0;cur.y++}render()};
-$("t-cal").onclick=function(){view="cal";render()};
-$("t-sum").onclick=function(){view="sum";render()};
+$("t-cal").onclick=function(){go("cal")};
+$("t-sum").onclick=function(){go("sum")};
+$("go-cal").onclick=function(){go("cal")};
+$("go-sum").onclick=function(){go("sum")};
+$("go-set").onclick=function(){go("set")};
+$("back").onclick=function(){go("home")};
 render();
 // ---- Λογαριασμός και αυτόματη αποθήκευση (Firebase) ----
 var user=null,syncing=false,syncErr=false,syncT=null,SYNK="kaoura-sync",lastSync=0;
@@ -481,7 +577,10 @@ function mergeRemote(r){
     if(du&&du>=eu){delete data[k];dels[k]=du;}else{data[k]=ru>lu?re:le;delete dels[k];}
   });
   var rc=r.cfg||{};
-  if((rc.u||0)>(cfg.u||0)){cfg.custom=rc.custom||[];cfg.customSym=rc.customSym||[];cfg.foods=rc.foods||[];if(rc.rem&&rc.rem.time){cfg.rem=rc.rem;$("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();}cfg.u=rc.u;}
+  if((rc.u||0)>(cfg.u||0)){cfg.name=rc.name||cfg.name||"";nameDraw();cfg.custom=rc.custom||[];cfg.customSym=rc.customSym||[];cfg.foods=rc.foods||[];if(rc.rem&&rc.rem.time){cfg.rem=rc.rem;$("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();}cfg.u=rc.u;}
+  else{if(!cfg.name&&rc.name){cfg.name=rc.name;nameDraw();}
+    ["custom","customSym","foods"].forEach(function(k){if(!(cfg[k]&&cfg[k].length)&&rc[k]&&rc[k].length)cfg[k]=rc[k];});}
+  renderQuote(true);if(view==="home")renderHome();
 }
 async function sync(){
   if(!user||!user.verified||!window.FB)return;
@@ -491,7 +590,7 @@ async function sync(){
     var r=await FB.load(uid);if(!user||user.uid!==uid)throw 0;
     if(r)mergeRemote(r);
     await FB.save(uid,{v:3,updated:Date.now(),data:JSON.stringify(data),dels:JSON.stringify(dels),
-      cfg:{custom:cfg.custom||[],customSym:cfg.customSym||[],foods:cfg.foods||[],rem:cfg.rem,u:cfg.u||0}});
+      cfg:{custom:cfg.custom||[],customSym:cfg.customSym||[],foods:cfg.foods||[],rem:cfg.rem,name:cfg.name||"",u:cfg.u||0}});
     try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(DELK,JSON.stringify(dels));localStorage.setItem(CFGK,JSON.stringify(cfg));}catch(e){}
     lastSync=Date.now();try{localStorage.setItem(SYNK,lastSync);}catch(e){}
     syncErr=false;if(!$("bg").classList.contains("open"))render();
@@ -506,7 +605,7 @@ function lgDraw(){
   $("lg-mode").textContent=lgNew?"Έχω ήδη λογαριασμό":"Νέος λογαριασμός";
   $("lg-pass").placeholder=lgNew?"Κωδικός (τουλάχιστον 6 χαρακτήρες)":"Κωδικός";
   $("lg-pass").autocomplete=lgNew?"new-password":"current-password";
-  $("lg-reset").hidden=lgNew;$("lg-err").textContent="";
+  $("lg-reset").hidden=lgNew;$("lg-name").hidden=!lgNew;$("lg-err").textContent="";
 }
 function authErr(e){
   var c=(e&&e.code)||"";
@@ -533,6 +632,7 @@ $("lg-go").onclick=async function(){
   if(!em){$("lg-err").textContent="Γράψε το email σου.";return;}
   btn.disabled=true;$("lg-err").textContent="";
   try{
+    if(lgNew){var nn=$("lg-name").value.trim();if(nn){cfg.name=nn;saveCfg();nameDraw();renderQuote(true);renderHome();}}
     await (lgNew?FB.signUp(em,pw):FB.signIn(em,pw));
     $("lg-bg").classList.remove("open");$("lg-pass").value="";
     if(lgNew){try{await FB.sendVerify();}catch(e){}setTimeout(openVerify,350);}else toast("Συνδέθηκες!");
@@ -565,7 +665,7 @@ $("ac-out").onclick=async function(){
   try{var pt=localStorage.getItem(PTK);if(pt)await FB.unpush(user.uid,pt);}catch(e){}
   try{localStorage.removeItem(PTK);}catch(e){}
   try{await FB.signOut();}catch(e){}
-  data={};dels={};lastSync=0;cfg.custom=[];cfg.customSym=[];cfg.foods=[];cfg.ok={};
+  data={};dels={};lastSync=0;cfg.custom=[];cfg.customSym=[];cfg.foods=[];cfg.ok={};cfg.name="";nameDraw();renderQuote(true);
   try{[KEY,DELK,SYNK].forEach(function(k){localStorage.removeItem(k)});}catch(e){}
   saveCfg();$("ac-bg").classList.remove("open");btn.disabled=false;render();drawAcct();toast("Αποσυνδέθηκες.");
 };
@@ -601,7 +701,7 @@ $("ac-del").onclick=async function(){
   try{
     try{var pt=localStorage.getItem(PTK);}catch(e){}
     await FB.deleteAccount(pw);
-    data={};dels={};lastSync=0;cfg.custom=[];cfg.customSym=[];cfg.foods=[];cfg.ok={};
+    data={};dels={};lastSync=0;cfg.custom=[];cfg.customSym=[];cfg.foods=[];cfg.ok={};cfg.name="";nameDraw();renderQuote(true);
     try{[KEY,DELK,SYNK,PTK,"kaoura-uid"].forEach(function(k){localStorage.removeItem(k)});}catch(e){}
     saveCfg();closeAnySheet();render();drawAcct();ntDraw();toast("Ο λογαριασμός διαγράφηκε.");
   }catch(e){$("ac-err").textContent=authErr(e);}
@@ -662,17 +762,32 @@ document.addEventListener("visibilitychange",function(){if(!document.hidden)read
 // Κουμπί «Ναι, καταχώριση» από την ειδοποίηση
 if(/[?&]today=1/.test(location.search)){
   try{history.replaceState(null,"",location.pathname);}catch(e){}
-  now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};view="cal";render();openSheet(now.getDate());
+  now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};
+  var spl=$("splash");if(spl)spl.remove();
+  setTimeout(function(){view="home";go("cal");openSheet(now.getDate());},0);
 }
+// ---- Όνομα χρήστη ----
+function nameDraw(){var el=$("set-name");if(el&&document.activeElement!==el)el.value=cfg.name||"";}
+nameDraw();
+$("set-name").addEventListener("change",function(){cfg.name=this.value.trim();saveCfg();renderQuote(true);renderHome();toast(cfg.name?"Γεια σου, "+voc(cfg.name)+"!":"Το όνομα αφαιρέθηκε.");});
+// ---- Άνοιγμα με τα δισκία ----
+(function(){
+  var sp=$("splash");if(!sp)return;
+  function done(){if(sp.parentNode)sp.parentNode.removeChild(sp);}
+  try{if(matchMedia("(prefers-reduced-motion: reduce)").matches){done();return;}}catch(e){}
+  sp.addEventListener("click",function(){sp.classList.add("skip");setTimeout(done,220);});
+  sp.addEventListener("animationend",function(ev){if(ev.target===sp)done();});
+  setTimeout(done,3000);
+})();
 // ---- Κλείσιμο φόρμας: σύρσιμο προς τα κάτω και κουμπί «πίσω» ----
-var SHEETS=["bg","lg-bg","ac-bg","vf-bg"],popping=false;
+var SHEETS=["bg","lg-bg","ac-bg","vf-bg"],popping=false,popped={};
 function closeAnySheet(){var c=false;SHEETS.forEach(function(id){var el=$(id);if(el.classList.contains("open")){if(id==="bg")closeSheet();else el.classList.remove("open");c=true;}});return c;}
 SHEETS.forEach(function(id){
   var bgEl=$(id),sh=bgEl.querySelector(".sheet"),was=false;
   new MutationObserver(function(){
     var on=bgEl.classList.contains("open");
     if(on&&!was){sh.style.transform="";try{history.pushState({sheet:id},"");}catch(e){}}
-    if(!on&&was&&!popping){try{if(history.state&&history.state.sheet===id)history.back();}catch(e){}}
+    if(!on&&was){if(popped[id])delete popped[id];else{try{if(history.state&&history.state.sheet===id)history.back();}catch(e){}}}
     was=on;
   }).observe(bgEl,{attributes:true,attributeFilter:["class"]});
   var y0=null,dy=0,t0=0,fromGrab=false;
@@ -696,7 +811,12 @@ SHEETS.forEach(function(id){
     else sh.style.transform="";
   });
 });
-window.addEventListener("popstate",function(){popping=true;closeAnySheet();popping=false;});
+window.addEventListener("popstate",function(ev){
+  SHEETS.forEach(function(id){if($(id).classList.contains("open"))popped[id]=1;});
+  popping=true;var c=closeAnySheet();popping=false;if(c)return;
+  var st=ev.state||{};if(st.sheet)return;
+  var v=st.page||"home";if(v!==view){view=v;window.scrollTo(0,0);render();}
+});
 // Ζητά από τον browser να μη σβήσει τα δεδομένα όταν γεμίσει ο χώρος
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 // Εγκατάσταση σαν εφαρμογή (PWA)
