@@ -86,6 +86,11 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 .brand{display:flex;align-items:center;gap:12px;margin:4px 0 14px}
 .brand h1{margin:0}
 .brand p{margin:2px 0 0;color:var(--muted);font-size:.85rem;line-height:1.35}
+.quote{position:relative;background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 46px 14px 20px;margin:0 0 14px;overflow:hidden}
+.quote::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--grad)}
+.quote::after{content:"\201D";position:absolute;right:12px;top:-6px;font-size:4.2rem;font-weight:800;line-height:1;background:var(--grad);-webkit-background-clip:text;background-clip:text;color:transparent;opacity:.35}
+.quote small{display:block;font-size:.75rem;font-weight:800;letter-spacing:.04em;color:var(--accent)}
+.quote p{margin:4px 0 0;font-size:1.08rem;font-weight:600;line-height:1.4;color:var(--ink)}
 .toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:.9rem;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90%;text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
 .cancel{background:none;color:var(--muted);flex:0 0 auto!important;padding:13px 10px!important}
@@ -93,7 +98,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 </head>
 <body>
 <main>
-<div class="brand"><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1>Καουροημερολόγιο</h1><p id="tag"></p></div></div>
+<div class="brand"><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1>Καουροημερολόγιο</h1></div></div>
+<div class="quote" role="note"><small>Η φράση της ημέρας</small><p id="tag"></p></div>
 <div class="tabs" role="tablist">
 <button role="tab" id="t-cal" aria-selected="true">Ημερολόγιο</button>
 <button role="tab" id="t-sum" aria-selected="false">Απολογισμός</button>
@@ -206,8 +212,44 @@ $("rem-on").onchange=function(){cfg.rem.on=this.checked;saveCfg();renderBanner()
 $("rem-time").onchange=function(){if(this.value){cfg.rem.time=this.value;saveCfg();calLink();renderBanner();}};
 setInterval(renderBanner,60000);
 function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("show")},3200);}
-var PH=["Ολυμπία, το Gaviscon είναι εδώ για σένα.","Μία μέρα τη φορά. Το Gaviscon είναι δίπλα σου.","Η καούρα περνάει. Το Gaviscon είναι εδώ.","Σημείωσε, δες το μοτίβο, φρόντισε τον εαυτό σου.","Όταν η μέρα δεν πάει καλά, το Gaviscon είναι εκεί για σένα.","Κάθε καταχώριση σε βοηθά να καταλάβεις τι σου φταίει."];
-$("tag").textContent=PH[Math.floor(Date.now()/864e5)%PH.length];
+var PH=[
+"Ολυμπία, το Gaviscon είναι εδώ για σένα.",
+"Η φλόγα της Ολυμπίας σβήνει με Gaviscon.",
+"Μία μέρα τη φορά. Το Gaviscon είναι δίπλα σου.",
+"Καλημέρα Ολυμπία! Σήμερα θα είναι μια ήρεμη μέρα.",
+"Μικρά γεύματα, μεγάλη ησυχία.",
+"Η καούρα περνάει. Το Gaviscon είναι εδώ.",
+"Το σώμα σου μιλάει. Εσύ το ακούς.",
+"Η φλόγα ανήκει στους Ολυμπιακούς Αγώνες, όχι στο στομάχι σου.",
+"Κάθε μέρα χωρίς καούρα είναι μια μικρή νίκη.",
+"Σημείωσε, δες το μοτίβο, φρόντισε τον εαυτό σου.",
+"Ολυμπία, αξίζεις μια μέρα χωρίς φωτιά.",
+"Λίγη βόλτα μετά το φαγητό, και το στομάχι λέει ευχαριστώ.",
+"Δεν χρειάζεται να είναι τέλεια μέρα. Αρκεί να είναι ήρεμη.",
+"Όταν η μέρα δεν πάει καλά, το Gaviscon είναι εκεί για σένα.",
+"Ο καφές μπορεί να περιμένει λίγο. Εσύ όχι.",
+"Ανάσα βαθιά. Το στρες βαραίνει και το στομάχι.",
+"Ολυμπία, το Gaviscon σε προσέχει όταν εσύ ξεχνάς.",
+"Ό,τι κι αν έγινε χθες, σήμερα είναι νέα μέρα.",
+"Το βραδινό λίγο νωρίτερα, η νύχτα πιο ήσυχη.",
+"Σήμερα αποφασίζεις εσύ, όχι η καούρα.",
+"Ένα μασώμενο δισκίο, και πάμε παρακάτω.",
+"Μην ξεχάσεις: το Gaviscon είναι στην τσάντα σου.",
+"Κάθε καταχώριση σε βοηθά να καταλάβεις τι σου φταίει.",
+"Ολυμπία, είσαι πιο δυνατή από κάθε καούρα.",
+"Λιγότερα πικάντικα, περισσότερα χαμόγελα.",
+"Αν σήμερα δυσκολεύει, αύριο θα είναι καλύτερα.",
+"Τρώγε αργά και απόλαυσε κάθε μπουκιά.",
+"Το μαξιλάρι λίγο ψηλότερα, ο ύπνος λίγο πιο γλυκός.",
+"Κράτα το ημερολόγιο, και το μοτίβο θα φανεί.",
+"Ήπια, μέτρια ή καθόλου: όλα μετράνε.",
+"Ολυμπία, σήμερα το στομάχι σου κάνει διάλειμμα."];
+// Αλλάζει κάθε μέρα στις 00:00 (τοπική ώρα)
+function dayNum(){var n=new Date();return Math.floor(Date.UTC(n.getFullYear(),n.getMonth(),n.getDate())/864e5)}
+var lastQ=-1;
+function renderQuote(){var d=dayNum();if(d===lastQ)return;lastQ=d;$("tag").textContent=PH[d%PH.length];}
+renderQuote();setInterval(renderQuote,60000);
+document.addEventListener("visibilitychange",function(){if(!document.hidden){renderQuote();renderBanner();}});
 function backupInfo(){
   var n=Object.keys(data).length,el=$("bk-info");
   if(cfg.last)el.textContent="Τελευταίο αντίγραφο: "+new Date(cfg.last).toLocaleDateString("el-GR")+".";
@@ -361,10 +403,11 @@ render();
 if("serviceWorker" in navigator&&window.isSecureContext){navigator.serviceWorker.register("sw.js").catch(function(){});}
 var instEvt=null;
 function isStandalone(){return (window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true}
-if(isStandalone())$("inst-done").hidden=false;
-window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();instEvt=e;$("inst-row").hidden=false;});
+var installed=isStandalone();
+if(installed)$("inst-done").hidden=false;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();instEvt=e;if(!installed)$("inst-row").hidden=false;});
 $("inst-btn").onclick=async function(){if(!instEvt)return;instEvt.prompt();try{await instEvt.userChoice;}catch(e){}instEvt=null;$("inst-row").hidden=true;};
-window.addEventListener("appinstalled",function(){$("inst-row").hidden=true;$("inst-done").hidden=false;toast("Το Καουροημερολόγιο εγκαταστάθηκε!");});
+window.addEventListener("appinstalled",function(){installed=true;$("inst-row").hidden=true;$("inst-done").hidden=false;toast("Το Καουροημερολόγιο εγκαταστάθηκε!");});
 </script>
 </body>
 </html>
