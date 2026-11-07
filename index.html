@@ -326,7 +326,7 @@ function isFutureMonth(y,m){return y>now.getFullYear()||(y===now.getFullYear()&&
 function $(id){return document.getElementById(id)}
 $("dows").innerHTML=DOW.map(function(d){return '<div class="dow">'+d+'</div>'}).join("");
 
-function render(){renderSong();
+function render(){renderSong();if(window.NIGHT)renderQuote();
   var home=view==="home",calish=view==="cal"||view==="sum";
   $("v-home").hidden=!home;$("calwrap").hidden=!calish;$("v-set").hidden=view!=="set";
   $("back").hidden=home;$("ptitle").textContent=view==="set"?"Ρυθμίσεις":"Καουροημερολόγιο";
@@ -445,7 +445,12 @@ function phrase(t){
   t=t.replace(" {n}!","!").replace(/^\{n\}, /,"");
   return t.charAt(0).toUpperCase()+t.slice(1);
 }
-function renderQuote(force){var d=dayNum();if(d===lastQ&&!force)return;lastQ=d;$("tag").textContent=phrase(PH[pickIdx(d,PH.length)]);}
+// Φράσεις καληνύχτας: ίδιες με το goodnight.js του kaoura-push. 00:00-07:59 εμφανίζεται αυτή στη θέση της φράσης της ημέρας.
+var NIGHT={"0": ["Καληνύχτα! Όνειρα γλυκά, αλλά όχι πολύ γλυκά, για να μη θυμώσει το στομάχι.", "Καληνύχτα, {n}. Η καούρα σήμερα έμεινε στον πάγκο.", "Σήμερα η φωτιά ούτε σπίρτο δεν άναψε. Καληνύχτα! 🧯", "Το στομάχι σου δηλώνει «χωρίς απώλειες». Καληνύχτα, κοιμήσου ήσυχα."], "1": ["Λίγη καουρίτσα σήμερα, τίποτα που δεν σβήνει ένα καλό μαξιλάρι. Καληνύχτα!", "Καληνύχτα, {n}. Ήταν απλώς ένα κεράκι, όχι πυρκαγιά. 🕯️"], "2": ["Δύσκολη μέρα για το στομάχι. Το Καουροημερολόγιο τα κατέγραψε όλα για τη δίκη. Καληνύχτα! ⚖️", "Σήμερα το στομάχι έκανε λίγη φασαρία. Απόψε του κλείνουμε το μικρόφωνο. Καληνύχτα! 🎤"], "3": ["Το Gaviscon στο κομοδίνο, το μαξιλάρι λίγο ψηλότερα, και καληνύχτα!", "Η πυροσβεστική ενημερώθηκε. Εσύ απλώς κοιμήσου, {n}. Καληνύχτα! 🚒", "Δύσκολη μέρα. Αύριο η καούρα θα έχει πιάσει δουλειά αλλού. Καληνύχτα!"], "none": ["Καληνύχτα! Το Καουροημερολόγιο φυλάει σκοπιά μέχρι το πρωί. 🛡️", "Ώρα για ύπνο! Καληνύχτα, και αύριο μην ξεχάσεις να μου πεις τα νέα. 📓", "Καληνύχτα, {n}. Ξέχασες να μου πεις πώς πήγε η μέρα, αλλά σε συγχωρώ. 😌"]};
+function nightPhrase(){var n=new Date(),y=new Date(n.getFullYear(),n.getMonth(),n.getDate()-1),k=ds(y.getFullYear(),y.getMonth(),y.getDate()),e=data[k],sv=e?([0,1,2,3].indexOf(e.s)>-1?e.s:1):"none",L=NIGHT[sv],
+  dn=Math.floor(Date.UTC(y.getFullYear(),y.getMonth(),y.getDate())/864e5),t=L[pickIdx(dn,L.length)],nm=(cfg.name||"").trim();
+  return {key:dn+"n"+sv+nm,text:nm?t.replace("{n}",voc(nm)):t.replace(/, \{n\}/,"")};}
+function renderQuote(force){var d=dayNum(),np=new Date().getHours()<8?nightPhrase():null,key=np?np.key:d;if(key===lastQ&&!force)return;lastQ=key;$("tag").textContent=np?np.text:phrase(PH[pickIdx(d,PH.length)]);}
 renderQuote();setInterval(renderQuote,60000);
 var SP="https://open.spotify.com/track/",YT="https://www.youtube.com/watch?v=";
 var SONGS={
