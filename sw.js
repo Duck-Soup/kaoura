@@ -1,12 +1,12 @@
 // Καουροημερολόγιο - service worker: κρατά την εφαρμογή διαθέσιμη χωρίς ίντερνετ
-var CACHE = "kaoura-v4";
-var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png"];
+var CACHE = "kaoura-v7";
+var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "fb.js", "badge-96.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
 });
 self.addEventListener("activate", function (e) {
   e.waitUntil(caches.keys().then(function (ks) {
-    return Promise.all(ks.filter(function (k) { return k !== CACHE; }).map(function (k) { return caches.delete(k); }));
+    return Promise.all(ks.filter(function (k) { return k !== CACHE && k !== "kaoura-flags"; }).map(function (k) { return caches.delete(k); }));
   }).then(function () { return self.clients.claim(); }));
 });
 // Δίκτυο πρώτα (για να έρχονται οι ενημερώσεις), αλλιώς από την cache
@@ -16,5 +16,31 @@ self.addEventListener("fetch", function (e) {
     var copy = r.clone(); caches.open(CACHE).then(function (c) { c.put(e.request, copy); }); return r;
   }).catch(function () {
     return caches.match(e.request, {ignoreSearch: true}).then(function (r) { return r || caches.match("index.html"); });
+  }));
+});
+
+// Καθημερινή ειδοποίηση (έρχεται από τον αποστολέα μέσω Firebase)
+self.addEventListener("push", function (e) {
+  var p = {}; try { p = e.data ? e.data.json() : {}; } catch (x) {}
+  var d = p.data || p;
+  e.waitUntil(self.registration.showNotification(d.title || "Καουροημερολόγιο", {
+    body: d.body || "Είχες καούρα σήμερα; Πάτα για να το σημειώσεις.",
+    icon: "icon-192.png", badge: "badge-96.png", tag: "kaoura-daily", renotify: true,
+    data: { day: d.day || "" },
+    actions: [{ action: "yes", title: "Ναι, καταχώριση" }, { action: "no", title: "Όχι, καμία" }]
+  }));
+});
+self.addEventListener("notificationclick", function (e) {
+  e.notification.close();
+  var day = (e.notification.data || {}).day;
+  if (!day) { var n = new Date(); day = n.getFullYear() + "-" + String(n.getMonth() + 1).padStart(2, "0") + "-" + String(n.getDate()).padStart(2, "0"); }
+  if (e.action === "no") {
+    e.waitUntil(caches.open("kaoura-flags").then(function (c) { return c.put("flag/no/" + day, new Response("1")); }));
+    return;
+  }
+  var url = new URL("./?today=1", self.registration.scope).href;
+  e.waitUntil(clients.matchAll({ type: "window", includeUncontrolled: true }).then(function (cs) {
+    for (var i = 0; i < cs.length; i++) { if ("navigate" in cs[i]) { return cs[i].navigate(url).then(function (c) { return c ? c.focus() : clients.openWindow(url); }).catch(function () { return clients.openWindow(url); }); } }
+    return clients.openWindow(url);
   }));
 });

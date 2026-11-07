@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="el"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Δοκιμή ειδοποίησης</title>
+<style>
+body{margin:0;font-family:system-ui,sans-serif;background:#0e1622;color:#eaf2f7;display:flex;min-height:100vh;align-items:center;justify-content:center}
+.c{max-width:360px;padding:24px;text-align:center}
+img{width:64px;height:64px;border-radius:16px}
+h1{font-size:1.2rem;margin:14px 0 6px}
+p{color:#93a5b8;font-size:.92rem;line-height:1.5}
+button{display:block;width:100%;margin-top:12px;font:inherit;font-weight:700;padding:14px;border:0;border-radius:12px;color:#fff;background:linear-gradient(120deg,#1fa9ad,#d6318a)}
+button.b2{background:#1d2c3d}
+#msg{min-height:1.5em;margin-top:14px;color:#ff5aa8}
+</style></head><body><div class="c">
+<img src="icon-192.png" alt="">
+<h1>Δοκιμή ειδοποίησης</h1>
+<p>Πάτα το κουμπί και επίτρεψε τις ειδοποιήσεις, αν σε ρωτήσει. Θα έρθει μια ειδοποίηση όπως θα έρχεται κάθε βράδυ.</p>
+<button id="now">Στείλε τώρα</button>
+<button id="later" class="b2">Στείλε σε 10 δευτερόλεπτα</button>
+<p id="msg"></p>
+</div>
+<script>
+var msg=document.getElementById("msg");
+async function send(){
+  if(!("Notification" in window)||!("serviceWorker" in navigator)){msg.textContent="Αυτός ο browser δεν υποστηρίζει ειδοποιήσεις. Δοκίμασε στο Chrome.";return false;}
+  var p=await Notification.requestPermission();
+  if(p!=="granted"){msg.textContent="Οι ειδοποιήσεις δεν επιτράπηκαν. Ενεργοποίησέ τες από τις ρυθμίσεις του browser για αυτή τη σελίδα.";return false;}
+  var reg=await navigator.serviceWorker.getRegistration()||await navigator.serviceWorker.register("sw.js");
+  reg=await navigator.serviceWorker.ready;
+  return reg;
+}
+function show(reg){
+  return reg.showNotification("Καουροημερολόγιο",{body:"Είχες καούρα σήμερα; Πάτα για να το σημειώσεις.",icon:"icon-192.png",badge:"badge-96.png",tag:"kaoura-test",renotify:true,vibrate:[120,60,120]});
+}
+document.getElementById("now").onclick=async function(){var r=await send();if(r){await show(r);msg.textContent="Στάλθηκε! Δες πάνω στην οθόνη.";}};
+document.getElementById("later").onclick=async function(){var r=await send();if(!r)return;msg.textContent="Έρχεται σε 10 δευτερόλεπτα. Μην κλείσεις τη σελίδα.";setTimeout(function(){show(r);msg.textContent="Στάλθηκε!";},10000);};
+</script></body></html>
