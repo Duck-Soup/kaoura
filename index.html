@@ -774,7 +774,6 @@ $("set-name").addEventListener("change",function(){cfg.name=this.value.trim();sa
 (function(){
   var sp=$("splash");if(!sp)return;
   function done(){if(sp.parentNode)sp.parentNode.removeChild(sp);}
-  try{if(matchMedia("(prefers-reduced-motion: reduce)").matches){done();return;}}catch(e){}
   sp.addEventListener("click",function(){sp.classList.add("skip");setTimeout(done,220);});
   sp.addEventListener("animationend",function(ev){if(ev.target===sp)done();});
   setTimeout(done,3000);
