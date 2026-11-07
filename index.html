@@ -58,6 +58,9 @@ h2{font-size:1rem;margin:0 0 10px}
 .sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
 .sheet-bg.open{display:flex}
 .sheet{background:var(--surface);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:90%;overflow-y:auto}
+.sheet{transition:transform .22s ease}
+.sheet.drag{transition:none}
+.grab{width:42px;height:5px;border-radius:3px;background:var(--line);margin:-8px auto 14px;touch-action:none}
 .sheet h2{font-size:1.1rem;margin-bottom:14px}
 .lbl{font-size:.88rem;color:var(--muted);margin:14px 0 6px}
 .row{display:flex;gap:8px;flex-wrap:wrap}
@@ -155,7 +158,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 
 <div class="toast" id="toast" role="status"></div>
 <div class="sheet-bg" id="lg-bg">
-<div class="sheet lgin" role="dialog" aria-modal="true" aria-labelledby="lg-title">
+<div class="sheet lgin" role="dialog" data-grab aria-modal="true" aria-labelledby="lg-title">
+<div class="grab" aria-hidden="true"></div>
 <h2 id="lg-title">Σύνδεση</h2>
 <p class="sub" id="lg-sub" style="margin:0">Για να μη χαθεί ποτέ το ημερολόγιό σου.</p>
 <input id="lg-email" type="email" placeholder="Email" autocomplete="email" autocapitalize="off" spellcheck="false">
@@ -167,7 +171,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 </div>
 </div>
 <div class="sheet-bg" id="ac-bg">
-<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="ac-title">
+<div class="sheet" role="dialog" data-grab aria-modal="true" aria-labelledby="ac-title">
+<div class="grab" aria-hidden="true"></div>
 <h2 id="ac-title" style="margin-bottom:4px"></h2>
 <p class="sub" id="ac-sub" style="margin:0"></p>
 <p class="sub" style="margin:12px 0 0">Με την αποσύνδεση το ημερολόγιο φεύγει από αυτό το κινητό, αλλά μένει στον λογαριασμό σου.</p>
@@ -175,7 +180,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 </div>
 </div>
 <div class="sheet-bg" id="bg">
-<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+<div class="sheet" role="dialog" data-grab aria-modal="true" aria-labelledby="sh-title">
+<div class="grab" aria-hidden="true"></div>
 <h2 id="sh-title"></h2>
 <div class="lbl">Πόσο έντονη ήταν;</div>
 <div class="row sev" id="sev"></div>
@@ -599,6 +605,39 @@ if(/[?&]today=1/.test(location.search)){
   try{history.replaceState(null,"",location.pathname);}catch(e){}
   now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};view="cal";render();openSheet(now.getDate());
 }
+// ---- Κλείσιμο φόρμας: σύρσιμο προς τα κάτω και κουμπί «πίσω» ----
+var SHEETS=["bg","lg-bg","ac-bg"],popping=false;
+function closeAnySheet(){var c=false;SHEETS.forEach(function(id){var el=$(id);if(el.classList.contains("open")){if(id==="bg")closeSheet();else el.classList.remove("open");c=true;}});return c;}
+SHEETS.forEach(function(id){
+  var bgEl=$(id),sh=bgEl.querySelector(".sheet"),was=false;
+  new MutationObserver(function(){
+    var on=bgEl.classList.contains("open");
+    if(on&&!was){sh.style.transform="";try{history.pushState({sheet:id},"");}catch(e){}}
+    if(!on&&was&&!popping){try{if(history.state&&history.state.sheet===id)history.back();}catch(e){}}
+    was=on;
+  }).observe(bgEl,{attributes:true,attributeFilter:["class"]});
+  var y0=null,dy=0,t0=0,fromGrab=false;
+  sh.addEventListener("touchstart",function(ev){
+    fromGrab=!!ev.target.closest(".grab,h2");
+    if(sh.scrollTop>0&&!fromGrab){y0=null;return;}
+    if(ev.target.closest("input,textarea"))  {y0=null;return;}
+    y0=ev.touches[0].clientY;dy=0;t0=Date.now();
+  },{passive:true});
+  sh.addEventListener("touchmove",function(ev){
+    if(y0===null)return;
+    dy=ev.touches[0].clientY-y0;
+    if(dy<=0){sh.classList.remove("drag");sh.style.transform="";if(!fromGrab)y0=null;return;}
+    if(ev.cancelable)ev.preventDefault();
+    sh.classList.add("drag");sh.style.transform="translateY("+dy+"px)";
+  },{passive:false});
+  sh.addEventListener("touchend",function(){
+    if(y0===null)return;y0=null;sh.classList.remove("drag");
+    var fast=dy>40&&dy/Math.max(1,Date.now()-t0)>0.6;
+    if(dy>110||fast){sh.style.transform="translateY(100%)";setTimeout(function(){if(id==="bg")closeSheet();else bgEl.classList.remove("open");sh.style.transform="";},180);}
+    else sh.style.transform="";
+  });
+});
+window.addEventListener("popstate",function(){popping=true;closeAnySheet();popping=false;});
 // Ζητά από τον browser να μη σβήσει τα δεδομένα όταν γεμίσει ο χώρος
 try{if(navigator.storage&&navigator.storage.persist)navigator.storage.persist();}catch(e){}
 // Εγκατάσταση σαν εφαρμογή (PWA)
