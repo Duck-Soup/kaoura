@@ -119,7 +119,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 .opt.sm{font-size:.82rem;padding:7px 12px}
 /* άνοιγμα */
 #splash{position:fixed;inset:0;z-index:50;background:linear-gradient(160deg,#14a3a6,#7a2a8c 55%,#c2187a);display:flex;align-items:center;justify-content:center;flex-direction:column;cursor:pointer;animation:spOut .45s ease-in 2.1s forwards}
-#splash.skip{animation:spOut .2s ease-in forwards}
+#splash.skip{animation:spOut .2s ease-in forwards!important}
+#splash:not(.go),#splash:not(.go) *{animation-play-state:paused!important}
 #splash .lg{width:110px;height:110px;border-radius:28px;box-shadow:0 10px 30px rgba(0,0,0,.35);animation:spPop .7s cubic-bezier(.2,1.6,.4,1) both;position:relative;z-index:2}
 #splash h1{color:#fff;font-size:1.5rem;margin:18px 0 0;opacity:0;animation:spFade .5s ease .8s forwards;position:relative;z-index:2}
 #splash .burst{position:absolute;left:50%;top:46%;width:0;height:0}
@@ -151,7 +152,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <div class="brand"><button class="back" id="back" type="button" aria-label="Πίσω" hidden>‹</button><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1 id="ptitle">Καουροημερολόγιο</h1></div></div>
 <section id="v-home">
 <p class="hello" id="hello"></p>
-<div class="quote" role="note"><small>Η φράση της ημέρας</small><p id="tag"></p></div>
+<div class="quote" role="note"><p id="tag" style="margin:0"></p></div>
 <div class="tiles">
 <button class="tile big" id="go-cal" type="button"><span class="ic"><svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="3"/><path d="M3 10h18M8 3v4M16 3v4"/></svg></span><span><b>Ημερολόγιο</b><span>Δες και σημείωσε τις μέρες σου</span></span><span class="chev">›</span></button>
 <button class="tile" id="go-sum" type="button"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span><b>Απολογισμός</b><span>Ο μήνας με μια ματιά</span></span></button>
@@ -183,7 +184,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <label class="field" style="margin:0 0 16px"><span>Το όνομά σου (για τις φράσεις της ημέρας)</span><input id="set-name" maxlength="30" autocomplete="given-name" placeholder="π.χ. Ολυμπία"></label>
 <div class="card set">
 <h2>Υπενθύμιση</h2>
-<div style="display:flex;align-items:center;gap:10px"><label style="margin:0;flex:1"><input type="checkbox" id="rem-on"> Ειδοποίηση κάθε μέρα στις</label><input type="time" id="rem-time" style="flex:none"></div>
+<div style="display:flex;align-items:center;gap:10px"><label style="margin:0;flex:1"><input type="checkbox" id="rem-on"> «Είχες καούρα σήμερα;» κάθε βράδυ στις</label><input type="time" id="rem-time" style="flex:none"></div>
 <p class="sub" id="nt-st" style="margin:10px 0 0"></p>
 <div class="row" id="nt-row" style="margin-top:8px"><button class="opt" id="nt-on" type="button">Ενεργοποίηση ειδοποιήσεων</button></div>
 </div>
@@ -267,8 +268,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 var KEY="kaoura-v1";
 var TRIG=["Καφές","Αλκοόλ","Άγχος και στρες","Κακή διατροφή","Γλυκά","Αναψυκτικά","Κάπνισμα"];
 var SYM=["Φούσκωμα","Πόνος στην κοιλιά","Δυσκοιλιότητα","Διάρροια","Πόρδες","Ναυτία","Κάψιμο στον λαιμό"];
-var CFGK="kaoura-cfg",cfg={custom:[],customSym:[],ok:{},rem:{on:true,time:"21:00"}};
-try{var c0=JSON.parse(localStorage.getItem(CFGK)||"null");if(c0){cfg.custom=c0.custom||[];cfg.customSym=c0.customSym||[];cfg.foods=c0.foods||[];cfg.ok=c0.ok||{};cfg.rem=c0.rem||cfg.rem;cfg.last=c0.last||0;}}catch(e){}
+var CFGK="kaoura-cfg",cfg={custom:[],customSym:[],ok:{},rem:{on:true,time:"21:00"},name:"",u:0};
+try{var c0=JSON.parse(localStorage.getItem(CFGK)||"null");if(c0){cfg.custom=c0.custom||[];cfg.customSym=c0.customSym||[];cfg.foods=c0.foods||[];cfg.ok=c0.ok||{};cfg.rem=c0.rem||cfg.rem;cfg.name=c0.name||"";cfg.u=c0.u||0;cfg.last=c0.last||0;}}catch(e){}
 function saveCfg(){cfg.u=Date.now();try{localStorage.setItem(CFGK,JSON.stringify(cfg));}catch(e){}if(window.syncSchedule)syncSchedule();}
 function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
 var SEV=["","Ήπια","Μέτρια","Έντονη"];
@@ -347,7 +348,6 @@ var PH=[
 "Λίγη βόλτα μετά το φαγητό, και το στομάχι λέει ευχαριστώ.",
 "Δεν χρειάζεται να είναι τέλεια μέρα. Αρκεί να είναι ήρεμη.",
 "Όταν η μέρα δεν πάει καλά, το Gaviscon είναι εκεί για σένα.",
-"Ο καφές μπορεί να περιμένει λίγο. Εσύ όχι.",
 "Ανάσα βαθιά. Το στρες βαραίνει και το στομάχι.",
 "{n}, το Gaviscon σε προσέχει όταν εσύ ξεχνάς.",
 "Ό,τι κι αν έγινε χθες, σήμερα είναι νέα μέρα.",
@@ -358,9 +358,7 @@ var PH=[
 "Κάθε καταχώριση σε βοηθά να καταλάβεις τι σου φταίει.",
 "{S}",
 "Λιγότερα πικάντικα, περισσότερα χαμόγελα.",
-"Αν σήμερα δυσκολεύει, αύριο θα είναι καλύτερα.",
 "Τρώγε αργά και απόλαυσε κάθε μπουκιά.",
-"Το μαξιλάρι λίγο ψηλότερα, ο ύπνος λίγο πιο γλυκός.",
 "Κράτα το ημερολόγιο, και το μοτίβο θα φανεί.",
 "Ήπια, μέτρια ή καθόλου: όλα μετράνε.",
 "{n}, σήμερα το στομάχι σου κάνει διάλειμμα."];
@@ -685,7 +683,7 @@ window.addEventListener("fb-ready",fbStart);fbStart();
 function openVerify(){$("vf-sub").textContent="Σου στείλαμε email στο "+maskEmail(user&&user.email)+". Πάτα το link μέσα σε αυτό και μετά «Το επιβεβαίωσα». Αν δεν το βλέπεις, κοίτα και στα ανεπιθύμητα (spam).";$("vf-err").textContent="";$("vf-bg").classList.add("open");}
 async function checkVerify(quiet){
   if(!user||user.verified||!window.FB)return;
-  try{var u=await FB.refresh();if(u&&u.verified){user=u;$("vf-bg").classList.remove("open");drawAcct();toast("Το email επιβεβαιώθηκε!");await sync();try{await pushRegister(false);}catch(e){}ntDraw();}
+  try{var u=await FB.refresh();if(u&&u.verified){user=u;$("vf-bg").classList.remove("open");drawAcct();ntDraw();toast("Το email επιβεβαιώθηκε!");await sync();try{await pushRegister(false);}catch(e){}ntDraw();}
     else if(!quiet)$("vf-err").textContent="Δεν έχει επιβεβαιωθεί ακόμα. Πάτα πρώτα το link στο email.";}
   catch(e){if(!quiet)$("vf-err").textContent=authErr(e);}
 }
@@ -718,8 +716,8 @@ function ntDraw(){
   btn.disabled=false;
   if(!ok||ntDraw.unsup){st.textContent="Αυτός ο browser δεν υποστηρίζει ειδοποιήσεις. Άνοιξε την εφαρμογή από το Chrome.";row.hidden=true;return;}
   if(perm==="denied"){st.textContent="Οι ειδοποιήσεις είναι μπλοκαρισμένες. Επίτρεψέ τες από τις ρυθμίσεις του κινητού για την εφαρμογή.";row.hidden=true;return;}
-  if(!user){st.textContent="Σύνδεσου πρώτα στον λογαριασμό σου (κάτω κάτω) και μετά πάτα το κουμπί.";row.hidden=false;btn.disabled=true;return;}
-  if(!user.verified){st.textContent="Επιβεβαίωσε πρώτα το email σου (κάτω κάτω).";row.hidden=false;btn.disabled=true;return;}
+  if(!user){st.textContent="Σύνδεσου πρώτα στον λογαριασμό σου (πιο πάνω) και μετά πάτα το κουμπί.";row.hidden=false;btn.disabled=true;return;}
+  if(!user.verified){st.textContent="Επιβεβαίωσε πρώτα το email σου (πιο πάνω).";row.hidden=false;btn.disabled=true;return;}
   if(perm==="granted"&&tok){st.innerHTML='<span class="ok">✓ Ενεργές σε αυτό το κινητό</span>';row.hidden=true;return;}
   st.textContent="Πάτα το κουμπί και επίτρεψε τις ειδοποιήσεις.";row.hidden=false;
 }
@@ -729,7 +727,8 @@ async function pushRegister(ask){
   if(ask){if((await Notification.requestPermission())!=="granted"){ntDraw();return false;}}
   else if(Notification.permission!=="granted")return false;
   if(!(await FB.pushSupported())){ntDraw.unsup=true;ntDraw();return false;}
-  var reg=await navigator.serviceWorker.ready,t=await FB.pushToken(reg);if(!t)throw new Error("no token");
+  var reg=await Promise.race([navigator.serviceWorker.ready,new Promise(function(_,rej){setTimeout(function(){rej(new Error("sw timeout"))},8000)})]);
+  var t=await FB.pushToken(reg);if(!t)throw new Error("no token");
   var o={on:!!cfg.rem.on,time:cfg.rem.time,tz:tzName(),tokens:{}};o.tokens[t]=Date.now();
   await FB.savePush(user.uid,o);
   try{localStorage.setItem(PTK,t);}catch(e){}
@@ -776,7 +775,10 @@ $("set-name").addEventListener("change",function(){cfg.name=this.value.trim();sa
   function done(){if(sp.parentNode)sp.parentNode.removeChild(sp);}
   sp.addEventListener("click",function(){sp.classList.add("skip");setTimeout(done,220);});
   sp.addEventListener("animationend",function(ev){if(ev.target===sp)done();});
-  setTimeout(done,3000);
+  // ξεκινά αφού φορτώσει η σελίδα, για να μην παίζει πίσω από την οθόνη φόρτωσης του Android
+  function start(){if(sp.classList.contains("go"))return;requestAnimationFrame(function(){requestAnimationFrame(function(){sp.classList.add("go");setTimeout(done,3200);});});}
+  if(document.readyState==="complete")setTimeout(start,250);else window.addEventListener("load",function(){setTimeout(start,250);});
+  setTimeout(start,4000);
 })();
 // ---- Κλείσιμο φόρμας: σύρσιμο προς τα κάτω και κουμπί «πίσω» ----
 var SHEETS=["bg","lg-bg","ac-bg","vf-bg"],popping=false,popped={};
