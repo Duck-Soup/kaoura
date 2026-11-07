@@ -157,6 +157,12 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 #songpop .hd{display:flex;align-items:center;font-weight:700;margin-bottom:10px}
 #songpop .x{margin-left:auto;background:none;border:0;color:var(--muted);font-size:1.4rem;line-height:1;cursor:pointer;padding:0 4px}
 #songpop .si{width:40px;height:40px;border-radius:12px;font-size:1.2rem}
+body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;background:url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%20400%20800%22%20preserveAspectRatio%3D%22none%22%3E%3Cdefs%3E%3ClinearGradient%20id%3D%22g%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%3Cstop%20offset%3D%220%22%20stop-color%3D%22%231fa9ad%22/%3E%3Cstop%20offset%3D%221%22%20stop-color%3D%22%23d6318a%22/%3E%3C/linearGradient%3E%3C/defs%3E%3Cpath%20d%3D%22M-20%20170%20C120%2060%20260%20260%20420%20120%20L420%20-20%20L-20%20-20Z%22%20fill%3D%22url%28%23g%29%22%20opacity%3D%22.22%22/%3E%3Cpath%20d%3D%22M-20%20190%20C120%2080%20260%20280%20420%20140%22%20fill%3D%22none%22%20stroke%3D%22url%28%23g%29%22%20stroke-width%3D%223%22%20opacity%3D%22.5%22/%3E%3Cpath%20d%3D%22M-20%20700%20C140%20640%20260%20760%20420%20680%20L420%20820%20L-20%20820Z%22%20fill%3D%22url%28%23g%29%22%20opacity%3D%22.14%22/%3E%3C/svg%3E") top/100% 100% no-repeat}
+.poo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.poo .stp{width:42px;height:42px;border-radius:50%;border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font-size:1.4rem;line-height:1;cursor:pointer;flex:none}
+.poo .n{min-width:40px;text-align:center;font-size:1.5rem;font-weight:800}
+.poo .em{font-size:1.3rem;letter-spacing:1px;line-height:1.3;flex:1 1 100px;min-width:0}
+#pootype{margin-top:10px}
 .cancel{background:none;color:var(--muted);flex:0 0 auto!important;padding:13px 10px!important}
 </style>
 </head>
@@ -273,9 +279,12 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <div class="lbl">Τι έφαγες;</div>
 <div class="row" id="food"></div>
 <div class="addrow"><input id="newfood" maxlength="32" placeholder="π.χ. πίτσα, φακές"><button id="addfood" type="button">Προσθήκη</button></div>
-<div class="lbl">Τι μπορεί να τη προκάλεσε;</div>
+<div class="lbl">Τι μπορεί να την προκάλεσε;</div>
 <div class="row" id="trig"></div>
 <div class="addrow"><input id="newtrig" maxlength="24" placeholder="Δική σου αιτία, π.χ. σοκολάτα"><button id="addtrig" type="button">Προσθήκη</button></div>
+<div class="lbl">Κακάκια της ημέρας 💩</div>
+<div class="poo"><button class="stp" id="poo-m" type="button" aria-label="Ένα λιγότερο">−</button><span class="n" id="poo-n">0</span><button class="stp" id="poo-p" type="button" aria-label="Ένα ακόμα">+</button><span class="em" id="poo-e" aria-hidden="true"></span></div>
+<div class="row" id="pootype"></div>
 <div class="lbl">Συμπτώματα</div>
 <div class="row" id="sym"></div>
 <div class="addrow"><input id="newsym" maxlength="28" placeholder="Άλλο σύμπτωμα"><button id="addsym" type="button">Προσθήκη</button></div>
@@ -471,7 +480,7 @@ $("days").addEventListener("click",function(ev){
 function openSheet(d){
   editing=ds(cur.y,cur.m,d);
   var e=data[editing];
-  form={s:e?e.s:null,t:e?e.t.slice():[],y:e&&e.y?e.y.slice():[],f:e&&e.f?e.f.slice():[]};
+  form={s:e?e.s:null,t:e?e.t.slice():[],y:e&&e.y?e.y.slice():[],f:e&&e.f?e.f.slice():[],p:e&&e.p||0,pt:e&&e.pt!=null?e.pt:null};
   $("sh-title").textContent=d+" "+MONTHS[cur.m]+" "+cur.y;
   $("note").value=e?e.n||"":"";
   $("del").style.display=e?"":"none";
@@ -491,13 +500,19 @@ function foodList(){
   var use={};Object.keys(data).forEach(function(k){(data[k].f||[]).forEach(function(x){use[x]=(use[x]||0)+1})});
   return (cfg.foods||[]).slice().sort(function(a,b){return (use[b]||0)-(use[a]||0)});
 }
-function drawForm(){
+var PT=["Σκληρά","Κανονικά","Μαλακά","Υγρά"];
+function drawPoo(){$("poo-n").textContent=form.p;$("poo-e").textContent=Array(form.p+1).join("💩");$("poo-m").disabled=!form.p;
+  $("pootype").hidden=!form.p;$("pootype").innerHTML=PT.map(function(t,i){return '<button class="opt" type="button" data-pt="'+i+'" aria-pressed="'+(form.pt===i)+'">'+t+'</button>'}).join("");}
+function drawForm(){drawPoo();
   $("sev").innerHTML=[0,1,2,3].map(function(s){return '<button class="opt" type="button" data-s="'+s+'" aria-pressed="'+(form.s===s)+'">'+SEVB[s]+'</button>'}).join("");
   $("trig").innerHTML=chips(TRIG,cfg.custom,form.t,"t");
   $("sym").innerHTML=chips(SYM,cfg.customSym,form.y,"y");
   var fl=foodList();
   $("food").innerHTML=(fl.length||form.f.length)?chips([],fl,form.f,"f"):'<p class="sub" style="margin:0">Γράψε τι έφαγες και πάτα Προσθήκη. Θα το θυμάμαι για τις επόμενες φορές.</p>';
 }
+$("poo-p").onclick=function(){if(form.p<20){form.p++;drawPoo();}};
+$("poo-m").onclick=function(){if(form.p>0){form.p--;if(!form.p)form.pt=null;drawPoo();}};
+$("pootype").addEventListener("click",function(ev){var b=ev.target.closest("[data-pt]");if(!b)return;var v=+b.getAttribute("data-pt");form.pt=form.pt===v?null:v;drawPoo();});
 $("sev").addEventListener("click",function(ev){var b=ev.target.closest("[data-s]");if(!b)return;form.s=+b.getAttribute("data-s");drawForm();});
 $("bg").querySelector(".sheet").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-k]");
@@ -535,9 +550,9 @@ $("cancel").onclick=closeSheet;
 $("bg").addEventListener("click",function(ev){if(ev.target===$("bg"))closeSheet()});
 $("save").onclick=function(){
   var sv=form.s===null?1:form.s,nt=$("note").value.trim();
-  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt){if(data[editing])dels[editing]=Date.now();delete data[editing];cfg.ok=cfg.ok||{};cfg.ok[editing]=1;saveCfg();persist();closeSheet();render();songPop(0);return;}
+  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt&&!form.p){if(data[editing])dels[editing]=Date.now();delete data[editing];cfg.ok=cfg.ok||{};cfg.ok[editing]=1;saveCfg();persist();closeSheet();render();songPop(0);return;}
   cfg.foods=cfg.foods||[];form.f.forEach(function(x){if(cfg.foods.indexOf(x)<0)cfg.foods.push(x)});saveCfg();
-  data[editing]={s:sv,t:form.t,y:form.y,f:form.f,n:nt,u:Date.now()};delete dels[editing];
+  data[editing]={s:sv,t:form.t,y:form.y,f:form.f,n:nt,u:Date.now()};if(form.p){data[editing].p=form.p;if(form.pt!=null)data[editing].pt=form.pt;}delete dels[editing];
   persist();closeSheet();render();
   songPop(sv);
 };
@@ -545,14 +560,15 @@ $("del").onclick=function(){if(cfg.ok&&cfg.ok[editing]){delete cfg.ok[editing];s
 
 function stats(y,m){
   var n=dim(y,m),span=isCurrent(y,m)?now.getDate():(isFutureMonth(y,m)?0:n);
-  var cnt=0,sev=[0,0,0,0],trig={},food={},sym={},symDays=0,run=0,best=0,sevSum=0;
+  var cnt=0,sev=[0,0,0,0],trig={},food={},sym={},symDays=0,run=0,best=0,sevSum=0,poo=0,pooDays=0,pt=[0,0,0,0];
   for(var d=1;d<=span;d++){
     var e=data[ds(y,m,d)];
+    if(e&&e.p){poo+=e.p;pooDays++;if(e.pt!=null&&pt[e.pt]!=null)pt[e.pt]++;}
     if(e&&e.y&&e.y.length){symDays++;e.y.forEach(function(t){sym[t]=(sym[t]||0)+1});}
     if(e&&e.s>=1){cnt++;sev[e.s]++;sevSum+=e.s;run=0;e.t.forEach(function(t){trig[t]=(trig[t]||0)+1});(e.f||[]).forEach(function(t){food[t]=(food[t]||0)+1});}
     else{run++;if(run>best)best=run;}
   }
-  return {span:span,cnt:cnt,food:food,sym:sym,symDays:symDays,free:span-cnt,sev:sev,trig:trig,best:best,avg:cnt?sevSum/cnt:0};
+  return {poo:poo,pooDays:pooDays,pt:pt,span:span,cnt:cnt,food:food,sym:sym,symDays:symDays,free:span-cnt,sev:sev,trig:trig,best:best,avg:cnt?sevSum/cnt:0};
 }
 function renderSum(){
   var s=stats(cur.y,cur.m),el=$("v-sum");
@@ -576,6 +592,10 @@ function renderSum(){
   h+='</div>';
   var yk=Object.keys(s.sym).sort(function(a,b){return s.sym[b]-s.sym[a]});
   if(yk.length){h+='<div class="card"><h2>Συμπτώματα</h2>';yk.forEach(function(t){h+=bar(esc(t),s.sym[t],s.symDays)});h+='<p class="sub" style="margin:8px 0 0">Σε '+s.symDays+' '+(s.symDays===1?'μέρα':'μέρες')+' με καταγεγραμμένα συμπτώματα.</p></div>';}
+  if(s.poo){var ptn=s.pt[0]+s.pt[1]+s.pt[2]+s.pt[3],mi=s.pt.indexOf(Math.max.apply(null,s.pt)),PTL=["σκληρά","κανονικά","μαλακά","υγρά"];
+    h+='<div class="card"><h2>Κακάκια 💩</h2><div class="big">'+s.poo+'</div><div class="sub">'+(isCurrent(cur.y,cur.m)?'αυτόν τον μήνα μέχρι σήμερα':'αυτόν τον μήνα')+(ptn?', κυρίως '+PTL[mi]:'')+' · περίπου '+(Math.round(s.poo/s.pooDays*10)/10).toString().replace(".",",")+' τη μέρα, σε '+s.pooDays+' '+(s.pooDays===1?'μέρα':'μέρες')+' με καταγραφή</div>';
+    if(ptn){h+='<div style="margin-top:10px">';[0,1,2,3].forEach(function(i){if(s.pt[i])h+=bar(PT[i],s.pt[i],ptn)});h+='</div>';}
+    h+='</div>';}
   var notes=[];
   if(hasPrev&&!isCurrent(cur.y,cur.m)||hasPrev&&isCurrent(cur.y,cur.m)){
     var diff=s.cnt-p.cnt;
