@@ -1,5 +1,5 @@
 // Καουροημερολόγιο - service worker: κρατά την εφαρμογή διαθέσιμη χωρίς ίντερνετ
-var CACHE = "kaoura-v25";
+var CACHE = "kaoura-v26";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "fb.js", "badge-96.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));

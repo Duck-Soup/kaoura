@@ -145,6 +145,17 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 .tile.big .ic{background:var(--grad);color:#fff;width:52px;height:52px}
 .tile b{font-size:1.02rem;display:block}.tile span{color:var(--muted);font-size:.82rem;display:block;margin-top:2px}
 .tile .chev{margin-left:auto;color:var(--muted);font-size:1.5rem}
+.song{display:flex;gap:12px;align-items:center}
+.song .si{width:44px;height:44px;border-radius:14px;display:flex;align-items:center;justify-content:center;background:var(--grad);font-size:1.3rem;flex:none}
+.song .sl{color:var(--accent);font-size:.78rem;font-weight:800}
+.song .st{font-weight:700;margin-top:2px}
+.song .sb{flex:1;min-width:0}
+.song a{flex:none;background:var(--grad);color:#fff;border-radius:999px;padding:9px 14px;font-weight:700;text-decoration:none;font-size:.85rem}
+#songpop{position:fixed;left:12px;right:12px;bottom:calc(16px + env(safe-area-inset-bottom,0px));z-index:40;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.35);max-width:456px;margin:0 auto;opacity:0;transform:translateY(20px);pointer-events:none;transition:.25s}
+#songpop.show{opacity:1;transform:none;pointer-events:auto}
+#songpop .hd{display:flex;align-items:center;font-weight:700;margin-bottom:10px}
+#songpop .x{margin-left:auto;background:none;border:0;color:var(--muted);font-size:1.4rem;line-height:1;cursor:pointer;padding:0 4px}
+#songpop .si{width:40px;height:40px;border-radius:12px;font-size:1.2rem}
 .cancel{background:none;color:var(--muted);flex:0 0 auto!important;padding:13px 10px!important}
 </style>
 </head>
@@ -160,6 +171,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <button class="tile" id="go-sum" type="button"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></span><span><b>Απολογισμός</b><span>Ο μήνας με μια ματιά</span></span></button>
 <button class="tile" id="go-set" type="button"><span class="ic"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.2 4.2l2.1 2.1M17.7 17.7l2.1 2.1M2 12h3M19 12h3M4.2 19.8l2.1-2.1M17.7 6.3l2.1-2.1"/></svg></span><span><b>Ρυθμίσεις</b><span>Υπενθύμιση, λογαριασμός</span></span></button>
 </div>
+<div class="card song" id="hsong" style="margin-top:12px"><span class="si">🎵</span><div class="sb"><div class="sl">Τραγούδι της ημέρας</div><div class="st" id="hs-t"></div><div class="sub" style="margin:0" id="hs-a"></div></div><a id="hs-l" href="#" target="_blank" rel="noopener">▶ Άκουσέ το</a></div>
 </section>
 <div id="calwrap">
 <div class="tabs" role="tablist">
@@ -208,6 +220,8 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 </main>
 
 <div class="toast" id="toast" role="status"></div>
+<div id="songpop" role="status"><div class="hd">Καταχωρήθηκε ✓<button class="x" id="sp-x" type="button" aria-label="Κλείσιμο">×</button></div><div class="song"><span class="si" id="sp-i">🔥</span><div class="sb"><div class="sl">Το τραγούδι της ημέρας</div><div class="st" id="sp-t"></div><div class="sub" style="margin:0" id="sp-a"></div></div><a id="sp-l" href="#" target="_blank" rel="noopener">▶ Άκουσέ το</a></div></div>
+
 <div class="sheet-bg" id="lg-bg">
 <div class="sheet lgin" role="dialog" data-grab aria-modal="true" aria-labelledby="lg-title">
 <div class="grab" aria-hidden="true"></div>
@@ -422,7 +436,22 @@ function phrase(t){
 }
 function renderQuote(force){var d=dayNum();if(d===lastQ&&!force)return;lastQ=d;$("tag").textContent=phrase(PH[pickIdx(d,PH.length)]);}
 renderQuote();setInterval(renderQuote,60000);
-document.addEventListener("visibilitychange",function(){if(!document.hidden){renderQuote();renderBanner();}});
+var SP="https://open.spotify.com/track/",YT="https://www.youtube.com/watch?v=";
+var SONGS={
+3:[["Ring of Fire","Johnny Cash",SP+"6YffUZJ2R06kyxyK6onezL"],["Great Balls of Fire","Jerry Lee Lewis",SP+"5jw1zzcYFivmuJK52JrnMK"],["Burning Down the House","Talking Heads",SP+"2VNfJpwdEQBLyXajaa6LWT"],["We Didn't Start the Fire","Billy Joel",SP+"3Cx4yrFaX8CeHwBMReOWXI"],["Firestarter","The Prodigy",SP+"1GTPxha6U7x9ElVxkQw3OK"],["Fuego","Ελένη Φουρέιρα",SP+"22ppznuzVF9LKamaaqMMqu"],["Φωτιά με φωτιά","Πάνος Κιάμος",SP+"4UFeQs17rVYLice4OUjNm7"],["Η φωτιά","Στέλιος Καζαντζίδης",YT+"qHYdU45jGuE"],["Καίγομαι καίγομαι","Γλυκερία",YT+"T7BE_F3uD_s"]],
+2:[["Burning Love","Elvis Presley",SP+"0tE6F0Umv0e9E4ZXqX61jQ"],["Light My Fire","The Doors",SP+"7aghcqWLL9hGMIb0VFdbyD"],["Girl on Fire","Alicia Keys",SP+"4esOae7i4rqTbAu9o5Pxco"],["Hot Stuff","Donna Summer",SP+"2zMJN9JvDlvGP4jB03l1Bz"],["Heat Waves","Glass Animals",SP+"02MWAaffLxlfxAUY7c5dvx"],["Φωτιά","Evangelia & Ελένη Φουρέιρα",SP+"7qMU6M7ccldiM1PzH7yzr4"],["Φωτιά μου","Ήβη Αδάμου & Γιώργος Μαζωνάκης",SP+"6LH44D5J4jBnQZWO51rVgd"],["Καίγομαι","Χρήστος Μενιδιάτης",SP+"2cmXJgjvOGin8Gm209HeM9"]],
+1:[["Smoke on the Water","Deep Purple",SP+"5SAUIWdZ04OxYfJFDchC7S"],["Set Fire to the Rain","Adele",SP+"2YlshLEFCJFjEoOlpLpcyU"],["Καίγομαι και σιγολιώνω","Ελένη Τσαλιγοπούλου",YT+"MYq0VNy-sXg"]],
+0:[["Ice Ice Baby","Vanilla Ice",SP+"2KK1SqHvzSBEC7omKRFpmb"],["Don't Worry Be Happy","Bobby McFerrin",SP+"4hObp5bmIJ3PP3cKA9K9GY"],["Here Comes the Sun","The Beatles",SP+"6dGnYIeXmHdcikdzNNDMm2"],["Happy","Pharrell Williams",SP+"6NPVjNh8Jhru9xOmyQigds"],["Feeling Good","Nina Simone",SP+"0nbOXVxcq4wSPamBPxAKGu"]]};
+var ALLS=[].concat(SONGS[3],SONGS[2],SONGS[1],SONGS[0]);
+function songSet(p,x){$(p+"-t").textContent=x[0];$(p+"-a").textContent=x[1];$(p+"-l").href=x[2];}
+var lastS=null;function renderSong(){var d=dayNum();if(d===lastS)return;lastS=d;songSet("hs",ALLS[pickIdx(d+101,ALLS.length)]);}
+renderSong();setInterval(renderSong,60000);
+function songPop(sv){var L=SONGS[sv]||SONGS[1],p=$("songpop");songSet("sp",L[pickIdx(dayNum(),L.length)]);$("sp-i").textContent=sv?"🔥":"☀️";
+  $("toast").classList.remove("show");p.classList.add("show");clearTimeout(songPop.h);songPop.h=setTimeout(function(){p.classList.remove("show")},7000);}
+$("sp-x").onclick=function(){clearTimeout(songPop.h);$("songpop").classList.remove("show");};
+$("sp-l").addEventListener("click",function(){setTimeout(function(){$("songpop").classList.remove("show")},300);});
+
+document.addEventListener("visibilitychange",function(){if(!document.hidden){renderQuote();renderSong();renderBanner();}});
 function renderCal(){
   var first=(new Date(cur.y,cur.m,1).getDay()+6)%7,n=dim(cur.y,cur.m),h="";
   for(var i=0;i<first;i++)h+='<button class="day empty" tabindex="-1" aria-hidden="true"></button>';
@@ -506,11 +535,11 @@ $("cancel").onclick=closeSheet;
 $("bg").addEventListener("click",function(ev){if(ev.target===$("bg"))closeSheet()});
 $("save").onclick=function(){
   var sv=form.s===null?1:form.s,nt=$("note").value.trim();
-  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt){if(data[editing])dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();toast("Τέλεια, μια ήρεμη μέρα!");return;}
+  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt){if(data[editing])dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();songPop(0);return;}
   cfg.foods=cfg.foods||[];form.f.forEach(function(x){if(cfg.foods.indexOf(x)<0)cfg.foods.push(x)});saveCfg();
   data[editing]={s:sv,t:form.t,y:form.y,f:form.f,n:nt,u:Date.now()};delete dels[editing];
   persist();closeSheet();render();
-  toast(sv?"Καταχωρήθηκε. Το Gaviscon είναι εδώ για σένα.":"Καταχωρήθηκε. Μια μέρα χωρίς καούρα!");
+  songPop(sv);
 };
 $("del").onclick=function(){dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();};
 
