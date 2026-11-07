@@ -493,11 +493,11 @@ $("cancel").onclick=closeSheet;
 $("bg").addEventListener("click",function(ev){if(ev.target===$("bg"))closeSheet()});
 $("save").onclick=function(){
   var sv=form.s===null?1:form.s,nt=$("note").value.trim();
-  if(sv===0&&!form.y.length&&!nt){if(data[editing])dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();toast("Τέλεια, μια ήρεμη μέρα!");return;}
+  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt){if(data[editing])dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();toast("Τέλεια, μια ήρεμη μέρα!");return;}
   cfg.foods=cfg.foods||[];form.f.forEach(function(x){if(cfg.foods.indexOf(x)<0)cfg.foods.push(x)});saveCfg();
   data[editing]={s:sv,t:form.t,y:form.y,f:form.f,n:nt,u:Date.now()};delete dels[editing];
   persist();closeSheet();render();
-  toast(sv?"Καταχωρήθηκε. Το Gaviscon είναι εδώ για σένα.":"Καταχωρήθηκαν τα συμπτώματα.");
+  toast(sv?"Καταχωρήθηκε. Το Gaviscon είναι εδώ για σένα.":"Καταχωρήθηκε. Μια μέρα χωρίς καούρα!");
 };
 $("del").onclick=function(){dels[editing]=Date.now();delete data[editing];persist();closeSheet();render();};
 
