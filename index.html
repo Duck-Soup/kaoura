@@ -177,6 +177,24 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <p class="sub" id="ac-sub" style="margin:0"></p>
 <p class="sub" style="margin:12px 0 0">Με την αποσύνδεση το ημερολόγιο φεύγει από αυτό το κινητό, αλλά μένει στον λογαριασμό σου.</p>
 <div class="actions"><button class="cancel" id="ac-close" type="button">Κλείσιμο</button><button class="del" id="ac-out" type="button">Αποσύνδεση</button></div>
+<button class="lnk mut" id="ac-delopen" type="button" style="margin-top:10px">Διαγραφή λογαριασμού</button>
+<div id="ac-delbox" hidden class="lgin">
+<p class="sub" style="margin:6px 0 0">Θα σβηστούν οριστικά ο λογαριασμός και όλο το ημερολόγιο. Γράψε τον κωδικό σου για επιβεβαίωση.</p>
+<input id="ac-pw" type="password" placeholder="Κωδικός" autocomplete="current-password">
+<p class="err" id="ac-err" role="alert"></p>
+<button class="save" id="ac-del" type="button" style="background:var(--s3);color:#fff">Οριστική διαγραφή</button>
+</div>
+</div>
+</div>
+<div class="sheet-bg" id="vf-bg">
+<div class="sheet lgin" role="dialog" data-grab aria-modal="true" aria-labelledby="vf-title">
+<div class="grab" aria-hidden="true"></div>
+<h2 id="vf-title">Επιβεβαίωσε το email σου</h2>
+<p class="sub" id="vf-sub" style="margin:0"></p>
+<p class="err" id="vf-err" role="alert"></p>
+<button class="save" id="vf-done" type="button">Το επιβεβαίωσα</button>
+<button class="lnk" id="vf-again" type="button">Ξαναστείλε το email</button>
+<button class="lnk mut" id="vf-out" type="button">Αποσύνδεση</button>
 </div>
 </div>
 <div class="sheet-bg" id="bg">
@@ -446,11 +464,13 @@ try{lastSync=+localStorage.getItem(SYNK)||0;}catch(e){}
 var CLOUD='<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M7 18h10a4 4 0 0 0 .5-7.97A6 6 0 0 0 6.1 9.5 4.3 4.3 0 0 0 7 18z"/></svg>';
 function hm(t){var d=new Date(t);return pad(d.getHours())+":"+pad(d.getMinutes())}
 function when(t){var d=new Date(t);return (ds(d.getFullYear(),d.getMonth(),d.getDate())===todayKey()?"σήμερα":d.toLocaleDateString("el-GR"))+" "+hm(t)}
+function maskEmail(e){e=String(e||"");var i=e.indexOf("@");if(i<1)return e;var n=e.slice(0,i);return n.slice(0,Math.min(2,n.length))+"•••"+e.slice(i)}
 function drawAcct(){
   var b=$("acct");
   if(!user){b.className="acct";b.innerHTML=CLOUD+'<span>Μόνο σε αυτό το κινητό</span><span class="rt" style="color:var(--accent)">Σύνδεση</span>';return;}
+  if(!user.verified){b.className="acct";b.innerHTML=CLOUD+'<span class="em">'+esc(maskEmail(user.email))+'</span><span class="rt" style="color:var(--accent)">επιβεβαίωση</span>';return;}
   var rt=syncing?'<span class="rt">…</span>':syncErr?'<span class="rt" style="color:var(--accent)">εκκρεμεί</span>':lastSync?'<span class="rt" style="color:var(--leaf)">✓ '+hm(lastSync)+'</span>':'';
-  b.className="acct on";b.innerHTML=CLOUD+'<span class="em">'+esc(user.email||"")+'</span>'+rt;
+  b.className="acct on";b.innerHTML=CLOUD+'<span class="em">'+esc(maskEmail(user.email))+'</span>'+rt;
 }
 window.syncSchedule=function(){if(!user)return;clearTimeout(syncT);syncT=setTimeout(sync,2000);};
 function mergeRemote(r){
@@ -464,7 +484,7 @@ function mergeRemote(r){
   if((rc.u||0)>(cfg.u||0)){cfg.custom=rc.custom||[];cfg.customSym=rc.customSym||[];cfg.foods=rc.foods||[];if(rc.rem&&rc.rem.time){cfg.rem=rc.rem;$("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();}cfg.u=rc.u;}
 }
 async function sync(){
-  if(!user||!window.FB)return;
+  if(!user||!user.verified||!window.FB)return;
   if(syncing){syncSchedule();return;}
   syncing=true;drawAcct();var uid=user.uid;
   try{
@@ -496,11 +516,13 @@ function authErr(e){
   if(/invalid-email|missing-email/.test(c))return "Το email δεν φαίνεται σωστό.";
   if(/missing-password/.test(c))return "Γράψε τον κωδικό.";
   if(/network-request-failed/.test(c))return "Δεν υπάρχει σύνδεση στο ίντερνετ.";
+  if(/requires-recent-login/.test(c))return "Για ασφάλεια, αποσυνδέσου, συνδέσου ξανά και δοκίμασε πάλι.";
   if(/too-many-requests/.test(c))return "Πολλές προσπάθειες. Δοκίμασε ξανά σε λίγο.";
   return "Κάτι πήγε στραβά. Δοκίμασε ξανά."+(c?" ("+c+")":"");
 }
 $("acct").onclick=function(){
-  if(user){drawAcSheet();$("ac-bg").classList.add("open");return;}
+  if(user&&!user.verified){openVerify();return;}
+  if(user){drawAcSheet();$("ac-delbox").hidden=true;$("ac-delopen").hidden=false;$("ac-bg").classList.add("open");return;}
   if(!window.FB){toast("Χρειάζεται ίντερνετ για τη σύνδεση.");return;}
   lgNew=false;lgDraw();$("lg-bg").classList.add("open");
 };
@@ -510,7 +532,11 @@ $("lg-go").onclick=async function(){
   var em=$("lg-email").value.trim(),pw=$("lg-pass").value,btn=this;
   if(!em){$("lg-err").textContent="Γράψε το email σου.";return;}
   btn.disabled=true;$("lg-err").textContent="";
-  try{await (lgNew?FB.signUp(em,pw):FB.signIn(em,pw));$("lg-bg").classList.remove("open");$("lg-pass").value="";toast(lgNew?"Ο λογαριασμός φτιάχτηκε!":"Συνδέθηκες!");}
+  try{
+    await (lgNew?FB.signUp(em,pw):FB.signIn(em,pw));
+    $("lg-bg").classList.remove("open");$("lg-pass").value="";
+    if(lgNew){try{await FB.sendVerify();}catch(e){}setTimeout(openVerify,350);}else toast("Συνδέθηκες!");
+  }
   catch(e){$("lg-err").textContent=authErr(e);}
   btn.disabled=false;
 };
@@ -522,13 +548,18 @@ $("lg-reset").onclick=async function(){
   catch(e){$("lg-err").textContent=authErr(e);}
 };
 function drawAcSheet(){
-  $("ac-title").textContent=user?user.email:"";
+  $("ac-title").textContent=user?maskEmail(user.email):"";
   $("ac-sub").textContent=syncErr?"Δεν έχει αποθηκευτεί ακόμα. Θα γίνει μόλις υπάρξει ίντερνετ.":lastSync?"Αποθηκεύτηκε "+when(lastSync)+".":"";
 }
 $("ac-close").onclick=function(){$("ac-bg").classList.remove("open")};
 $("ac-bg").addEventListener("click",function(ev){if(ev.target===this)this.classList.remove("open")});
+async function plainSignOut(){
+  try{await FB.signOut();}catch(e){}
+  closeAnySheet();drawAcct();ntDraw();toast("Αποσυνδέθηκες.");
+}
 $("ac-out").onclick=async function(){
   var btn=this;btn.disabled=true;
+  if(!user.verified){btn.disabled=false;return plainSignOut();}
   await sync();
   if(syncErr){btn.disabled=false;toast("Χρειάζεται ίντερνετ για να αποθηκευτούν όλα πριν την αποσύνδεση.");return;}
   try{var pt=localStorage.getItem(PTK);if(pt)await FB.unpush(user.uid,pt);}catch(e){}
@@ -545,12 +576,39 @@ function fbStart(){
     if(!u){lastSync=0;drawAcct();ntDraw();return;}
     if(u.uid!==prev){var stored="";try{stored=localStorage.getItem("kaoura-uid")||"";localStorage.setItem("kaoura-uid",u.uid);}catch(e){}
       if(stored&&stored!==u.uid){lastSync=0;}}
-    drawAcct();sync().then(function(){return pushRegister(false)}).catch(function(){}).then(ntDraw);
+    drawAcct();ntDraw();if(!u.verified)return;
+    sync().then(function(){return pushRegister(false)}).catch(function(){}).then(ntDraw);
   });
 }
 window.addEventListener("fb-ready",fbStart);fbStart();
+// ---- Επιβεβαίωση email ----
+function openVerify(){$("vf-sub").textContent="Σου στείλαμε email στο "+maskEmail(user&&user.email)+". Πάτα το link μέσα σε αυτό και μετά «Το επιβεβαίωσα». Αν δεν το βλέπεις, κοίτα και στα ανεπιθύμητα (spam).";$("vf-err").textContent="";$("vf-bg").classList.add("open");}
+async function checkVerify(quiet){
+  if(!user||user.verified||!window.FB)return;
+  try{var u=await FB.refresh();if(u&&u.verified){user=u;$("vf-bg").classList.remove("open");drawAcct();toast("Το email επιβεβαιώθηκε!");await sync();try{await pushRegister(false);}catch(e){}ntDraw();}
+    else if(!quiet)$("vf-err").textContent="Δεν έχει επιβεβαιωθεί ακόμα. Πάτα πρώτα το link στο email.";}
+  catch(e){if(!quiet)$("vf-err").textContent=authErr(e);}
+}
+$("vf-done").onclick=function(){checkVerify(false)};
+$("vf-again").onclick=async function(){try{await FB.sendVerify();$("vf-err").textContent="";toast("Στάλθηκε ξανά.");}catch(e){$("vf-err").textContent=authErr(e);}};
+$("vf-out").onclick=plainSignOut;
+$("vf-bg").addEventListener("click",function(ev){if(ev.target===this)this.classList.remove("open")});
+// ---- Διαγραφή λογαριασμού ----
+$("ac-delopen").onclick=function(){$("ac-delbox").hidden=false;this.hidden=true;$("ac-err").textContent="";$("ac-pw").value="";};
+$("ac-del").onclick=async function(){
+  var pw=$("ac-pw").value,btn=this;if(!pw){$("ac-err").textContent="Γράψε τον κωδικό σου.";return;}
+  btn.disabled=true;
+  try{
+    try{var pt=localStorage.getItem(PTK);}catch(e){}
+    await FB.deleteAccount(pw);
+    data={};dels={};lastSync=0;cfg.custom=[];cfg.customSym=[];cfg.foods=[];cfg.ok={};
+    try{[KEY,DELK,SYNK,PTK,"kaoura-uid"].forEach(function(k){localStorage.removeItem(k)});}catch(e){}
+    saveCfg();closeAnySheet();render();drawAcct();ntDraw();toast("Ο λογαριασμός διαγράφηκε.");
+  }catch(e){$("ac-err").textContent=authErr(e);}
+  btn.disabled=false;
+};
 drawAcct();
-document.addEventListener("visibilitychange",function(){if(!document.hidden&&user)sync();});
+document.addEventListener("visibilitychange",function(){if(document.hidden||!user)return;if(user.verified)sync();else checkVerify(true);});
 window.addEventListener("online",function(){if(user)sync();});
 // ---- Ειδοποιήσεις ----
 var PTK="kaoura-pushtok";
@@ -561,12 +619,13 @@ function ntDraw(){
   if(!ok||ntDraw.unsup){st.textContent="Αυτός ο browser δεν υποστηρίζει ειδοποιήσεις. Άνοιξε την εφαρμογή από το Chrome.";row.hidden=true;return;}
   if(perm==="denied"){st.textContent="Οι ειδοποιήσεις είναι μπλοκαρισμένες. Επίτρεψέ τες από τις ρυθμίσεις του κινητού για την εφαρμογή.";row.hidden=true;return;}
   if(!user){st.textContent="Σύνδεσου πρώτα στον λογαριασμό σου (κάτω κάτω) και μετά πάτα το κουμπί.";row.hidden=false;btn.disabled=true;return;}
+  if(!user.verified){st.textContent="Επιβεβαίωσε πρώτα το email σου (κάτω κάτω).";row.hidden=false;btn.disabled=true;return;}
   if(perm==="granted"&&tok){st.innerHTML='<span class="ok">✓ Ενεργές σε αυτό το κινητό</span>';row.hidden=true;return;}
   st.textContent="Πάτα το κουμπί και επίτρεψε τις ειδοποιήσεις.";row.hidden=false;
 }
 function tzName(){try{return Intl.DateTimeFormat().resolvedOptions().timeZone||"Europe/Athens"}catch(e){return "Europe/Athens"}}
 async function pushRegister(ask){
-  if(!user||!window.FB||!("Notification" in window)||!("serviceWorker" in navigator))return false;
+  if(!user||!user.verified||!window.FB||!("Notification" in window)||!("serviceWorker" in navigator))return false;
   if(ask){if((await Notification.requestPermission())!=="granted"){ntDraw();return false;}}
   else if(Notification.permission!=="granted")return false;
   if(!(await FB.pushSupported())){ntDraw.unsup=true;ntDraw();return false;}
@@ -606,7 +665,7 @@ if(/[?&]today=1/.test(location.search)){
   now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};view="cal";render();openSheet(now.getDate());
 }
 // ---- Κλείσιμο φόρμας: σύρσιμο προς τα κάτω και κουμπί «πίσω» ----
-var SHEETS=["bg","lg-bg","ac-bg"],popping=false;
+var SHEETS=["bg","lg-bg","ac-bg","vf-bg"],popping=false;
 function closeAnySheet(){var c=false;SHEETS.forEach(function(id){var el=$(id);if(el.classList.contains("open")){if(id==="bg")closeSheet();else el.classList.remove("open");c=true;}});return c;}
 SHEETS.forEach(function(id){
   var bgEl=$(id),sh=bgEl.querySelector(".sheet"),was=false;
