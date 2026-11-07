@@ -592,14 +592,14 @@ function renderSum(){
   h+='</div>';
   var yk=Object.keys(s.sym).sort(function(a,b){return s.sym[b]-s.sym[a]});
   if(yk.length){h+='<div class="card"><h2>Συμπτώματα</h2>';yk.forEach(function(t){h+=bar(esc(t),s.sym[t],s.symDays)});h+='<p class="sub" style="margin:8px 0 0">Σε '+s.symDays+' '+(s.symDays===1?'μέρα':'μέρες')+' με καταγεγραμμένα συμπτώματα.</p></div>';}
-  if(s.poo){var ptn=s.pt[0]+s.pt[1]+s.pt[2]+s.pt[3],mi=s.pt.indexOf(Math.max.apply(null,s.pt)),PTL=["σκληρά","κανονικά","μαλακά","υγρά"];
+  {var ptn=s.pt[0]+s.pt[1]+s.pt[2]+s.pt[3],mi=s.pt.indexOf(Math.max.apply(null,s.pt)),PTL=["σκληρά","κανονικά","μαλακά","υγρά"];
     h+='<div class="card"><h2>Κακάκια 💩</h2><div class="big">'+s.poo+'</div><div class="sub">'+(isCurrent(cur.y,cur.m)?'αυτόν τον μήνα μέχρι σήμερα':'αυτόν τον μήνα')+(ptn?', κυρίως '+PTL[mi]:'')+' · κατά μέσο όρο '+(Math.round(s.poo/s.span*10)/10).toString().replace(".",",")+' τη μέρα ('+s.poo+' σε '+s.span+' '+(s.span===1?'μέρα':'μέρες')+')</div>';
     if(ptn){h+='<div style="margin-top:10px">';[0,1,2,3].forEach(function(i){if(s.pt[i])h+=bar(PT[i],s.pt[i],ptn)});h+='</div>';}
     h+='</div>';}
   var notes=[];
   if(hasPrev&&!isCurrent(cur.y,cur.m)||hasPrev&&isCurrent(cur.y,cur.m)){
     var diff=s.cnt-p.cnt;
-    if(isCurrent(cur.y,cur.m)){var pr=Math.round(p.cnt/dim(py,pm)*100);notes.push('Τον προηγούμενο μήνα η καούρα εμφανίστηκε στο '+pr+'% των ημερών, φέτος μέχρι τώρα στο '+pct+'%.');}
+    if(isCurrent(cur.y,cur.m)){var pr=Math.round(p.cnt/dim(py,pm)*100);notes.push('Τον προηγούμενο μήνα η καούρα εμφανίστηκε στο '+pr+'% των ημερών, αυτόν τον μήνα μέχρι τώρα στο '+pct+'%.');}
     else if(diff<0)notes.push('Καλύτερα από τον προηγούμενο μήνα: '+(-diff)+' λιγότερες μέρες με καούρα.');
     else if(diff>0)notes.push('Χειρότερα από τον προηγούμενο μήνα: '+diff+' περισσότερες μέρες με καούρα.');
     else notes.push('Ίδιος αριθμός ημερών με τον προηγούμενο μήνα.');
