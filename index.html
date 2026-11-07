@@ -312,6 +312,7 @@ var DOW=["Δ","Τ","Τ","Π","Π","Σ","Κ"];
 var data={},DELK="kaoura-dels",dels={};
 try{dels=JSON.parse(localStorage.getItem(DELK)||"{}")||{};}catch(e){dels={};}
 try{var raw=localStorage.getItem(KEY);if(raw)data=JSON.parse(raw)||{};}catch(e){data={};}
+function markCalm(k){if(!data[k]){data[k]={s:0,t:[],y:[],f:[],n:"",u:Date.now()};delete dels[k];persist();}}
 function persist(){try{localStorage.setItem(KEY,JSON.stringify(data));localStorage.setItem(DELK,JSON.stringify(dels));}catch(e){}if(window.syncSchedule)syncSchedule();}
 var now=new Date();
 var cur={y:now.getFullYear(),m:now.getMonth()};
@@ -359,7 +360,7 @@ function renderBanner(){
   if(view!=="cal"||!cfg.rem.on||data[k]||cfg.ok[k]||hm<cfg.rem.time){b.innerHTML="";return;}
   b.innerHTML='<div class="banner" role="status"><p>Είχες καούρα σήμερα;</p><div class="row"><button id="b-yes">Ναι, καταχώριση</button><button id="b-no">Όχι, καμία</button></div></div>';
   $("b-yes").onclick=function(){now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};go("cal");openSheet(now.getDate());};
-  $("b-no").onclick=function(){cfg.ok[k]=1;saveCfg();renderBanner();renderSong();toast("Τέλεια, μια ήρεμη μέρα!");};
+  $("b-no").onclick=function(){markCalm(k);render();renderBanner();toast("Τέλεια, μια ήρεμη μέρα!");};
 }
 function calLink(){}
 $("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();
@@ -552,7 +553,7 @@ $("cancel").onclick=closeSheet;
 $("bg").addEventListener("click",function(ev){if(ev.target===$("bg"))closeSheet()});
 $("save").onclick=function(){
   var sv=form.s===null?1:form.s,nt=$("note").value.trim();
-  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt&&!form.p){if(data[editing])dels[editing]=Date.now();delete data[editing];cfg.ok=cfg.ok||{};cfg.ok[editing]=1;saveCfg();persist();closeSheet();render();songPop(0);return;}
+  if(sv===0&&!form.y.length&&!form.f.length&&!form.t.length&&!nt&&!form.p){data[editing]={s:0,t:[],y:[],f:[],n:"",u:Date.now()};delete dels[editing];persist();closeSheet();render();songPop(0);return;}
   cfg.foods=cfg.foods||[];form.f.forEach(function(x){if(cfg.foods.indexOf(x)<0)cfg.foods.push(x)});saveCfg();
   data[editing]={s:sv,t:form.t,y:form.y,f:form.f,n:nt,u:Date.now()};if(form.p){data[editing].p=form.p;if(form.pt!=null)data[editing].pt=form.pt;}delete dels[editing];
   persist();closeSheet();render();
@@ -825,10 +826,11 @@ async function readFlags(){
   try{
     if(!("caches" in window))return;
     var c=await caches.open("kaoura-flags"),ks=await c.keys(),ch=false;
-    for(var i=0;i<ks.length;i++){var m=ks[i].url.match(/flag\/no\/(\d{4}-\d{2}-\d{2})/);if(m){cfg.ok[m[1]]=1;ch=true;}await c.delete(ks[i]);}
-    if(ch){saveCfg();renderBanner();renderSong();}
+    for(var i=0;i<ks.length;i++){var m=ks[i].url.match(/flag\/no\/(\d{4}-\d{2}-\d{2})/);if(m){markCalm(m[1]);ch=true;}await c.delete(ks[i]);}
+    if(ch){render();renderBanner();}
   }catch(e){}
 }
+try{var okm=false;Object.keys(cfg.ok||{}).forEach(function(k){if(!data[k]){data[k]={s:0,t:[],y:[],f:[],n:"",u:Date.now()};delete dels[k];}okm=true;});if(okm){cfg.ok={};saveCfg();persist();render();}}catch(e){}
 readFlags();
 document.addEventListener("visibilitychange",function(){if(!document.hidden)readFlags();});
 // Κουμπί «Ναι, καταχώριση» από την ειδοποίηση
