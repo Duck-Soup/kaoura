@@ -2,6 +2,7 @@
 <html lang="el">
 <head>
 <meta charset="utf-8">
+<script>if(/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1))document.documentElement.style.background="#7a2a8c";</script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Καουροημερολόγιο</title>
 <link rel="manifest" href="manifest.webmanifest">
@@ -9,6 +10,7 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="Καουροημερολόγιο">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="theme-color" content="#14a3a6">
 <link rel="icon" href="icon-192.png">
 <style>
@@ -192,7 +194,15 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <h2>Εγκατάσταση στο κινητό</h2>
 <div class="row" id="inst-row" hidden style="margin-bottom:10px"><button class="opt" id="inst-btn" type="button">Εγκατάσταση εφαρμογής</button></div>
 <p class="sub" id="inst-done" hidden style="margin:0 0 6px">Η εφαρμογή είναι εγκατεστημένη.</p>
-<p class="sub" style="margin:0">Στο Chrome: μενού ⋮ και μετά «Προσθήκη στην αρχική οθόνη» (ή «Εγκατάσταση εφαρμογής»). Θα ανοίγει σαν κανονική εφαρμογή, με το λογότυπο.</p>
+<p class="sub" id="inst-and" style="margin:0">Στο Chrome: μενού ⋮ και μετά «Προσθήκη στην αρχική οθόνη» (ή «Εγκατάσταση εφαρμογής»). Θα ανοίγει σαν κανονική εφαρμογή, με το λογότυπο.</p>
+<div id="inst-ios" hidden>
+<p class="sub" style="margin:0 0 8px">Στο iPhone, από το <b>Safari</b>:</p>
+<ol class="sub" style="margin:0;padding-left:20px;line-height:1.7">
+<li>Πάτα <b>Κοινοποίηση</b> <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="vertical-align:-3px" aria-hidden="true"><path d="M12 3v12M8 7l4-4 4 4"/><path d="M6 11v9h12v-9"/></svg> κάτω στη μέση.</li>
+<li>Πάτα <b>«Προσθήκη στην οθόνη Αφετηρίας»</b>.</li>
+<li>Άνοιγε την εφαρμογή πάντα από το εικονίδιο.</li>
+</ol>
+</div>
 </div>
 </section>
 </main>
@@ -771,7 +781,7 @@ document.addEventListener("visibilitychange",function(){if(!document.hidden)read
 if(/[?&]today=1/.test(location.search)){
   try{history.replaceState(null,"",location.pathname);}catch(e){}
   now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};
-  var spl=$("splash");if(spl)spl.remove();
+  var spl=$("splash");if(spl)spl.remove();document.documentElement.style.background="";
   setTimeout(function(){view="home";go("cal");openSheet(now.getDate());},0);
 }
 // ---- Όνομα χρήστη ----
@@ -781,7 +791,7 @@ $("set-name").addEventListener("change",function(){cfg.name=this.value.trim();sa
 // ---- Άνοιγμα με τα δισκία ----
 (function(){
   var sp=$("splash");if(!sp)return;
-  function done(){if(sp.parentNode)sp.parentNode.removeChild(sp);}
+  function done(){if(sp.parentNode)sp.parentNode.removeChild(sp);document.documentElement.style.background="";}
   sp.addEventListener("click",function(){sp.classList.add("skip");setTimeout(done,220);});
   sp.addEventListener("animationend",function(ev){if(ev.target===sp)done();});
   // ξεκινά αφού φορτώσει η σελίδα, για να μην παίζει πίσω από την οθόνη φόρτωσης του Android
@@ -834,6 +844,9 @@ if("serviceWorker" in navigator&&window.isSecureContext){navigator.serviceWorker
 var instEvt=null;
 function isStandalone(){return (window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true}
 var installed=isStandalone();
+var isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);
+if(isIOS){$("inst-and").hidden=true;$("inst-ios").hidden=installed;}
+if(installed)$("inst-and").hidden=true;
 if(installed)$("inst-done").hidden=false;
 window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();instEvt=e;if(!installed)$("inst-row").hidden=false;});
 $("inst-btn").onclick=async function(){if(!instEvt)return;instEvt.prompt();try{await instEvt.userChoice;}catch(e){}instEvt=null;$("inst-row").hidden=true;};
