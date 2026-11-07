@@ -282,7 +282,7 @@ body::before{content:"";position:fixed;inset:0;z-index:-1;pointer-events:none;ba
 <div class="lbl">Τι μπορεί να την προκάλεσε;</div>
 <div class="row" id="trig"></div>
 <div class="addrow"><input id="newtrig" maxlength="24" placeholder="Δική σου αιτία, π.χ. σοκολάτα"><button id="addtrig" type="button">Προσθήκη</button></div>
-<div class="lbl">Κακάκια της ημέρας 💩</div>
+<div class="lbl">Κακάκια της ημέρας (πόσες φορές) 💩</div>
 <div class="poo"><button class="stp" id="poo-m" type="button" aria-label="Ένα λιγότερο">−</button><span class="n" id="poo-n">0</span><button class="stp" id="poo-p" type="button" aria-label="Ένα ακόμα">+</button><span class="em" id="poo-e" aria-hidden="true"></span></div>
 <div class="row" id="pootype"></div>
 <div class="lbl">Συμπτώματα</div>
@@ -593,7 +593,7 @@ function renderSum(){
   var yk=Object.keys(s.sym).sort(function(a,b){return s.sym[b]-s.sym[a]});
   if(yk.length){h+='<div class="card"><h2>Συμπτώματα</h2>';yk.forEach(function(t){h+=bar(esc(t),s.sym[t],s.symDays)});h+='<p class="sub" style="margin:8px 0 0">Σε '+s.symDays+' '+(s.symDays===1?'μέρα':'μέρες')+' με καταγεγραμμένα συμπτώματα.</p></div>';}
   if(s.poo){var ptn=s.pt[0]+s.pt[1]+s.pt[2]+s.pt[3],mi=s.pt.indexOf(Math.max.apply(null,s.pt)),PTL=["σκληρά","κανονικά","μαλακά","υγρά"];
-    h+='<div class="card"><h2>Κακάκια 💩</h2><div class="big">'+s.poo+'</div><div class="sub">'+(isCurrent(cur.y,cur.m)?'αυτόν τον μήνα μέχρι σήμερα':'αυτόν τον μήνα')+(ptn?', κυρίως '+PTL[mi]:'')+' · περίπου '+(Math.round(s.poo/s.pooDays*10)/10).toString().replace(".",",")+' τη μέρα, σε '+s.pooDays+' '+(s.pooDays===1?'μέρα':'μέρες')+' με καταγραφή</div>';
+    h+='<div class="card"><h2>Κακάκια 💩</h2><div class="big">'+s.poo+'</div><div class="sub">'+(isCurrent(cur.y,cur.m)?'αυτόν τον μήνα μέχρι σήμερα':'αυτόν τον μήνα')+(ptn?', κυρίως '+PTL[mi]:'')+' · κατά μέσο όρο '+(Math.round(s.poo/s.span*10)/10).toString().replace(".",",")+' τη μέρα ('+s.poo+' σε '+s.span+' '+(s.span===1?'μέρα':'μέρες')+')</div>';
     if(ptn){h+='<div style="margin-top:10px">';[0,1,2,3].forEach(function(i){if(s.pt[i])h+=bar(PT[i],s.pt[i],ptn)});h+='</div>';}
     h+='</div>';}
   var notes=[];
