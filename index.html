@@ -469,7 +469,8 @@ function renderCal(){
     var dt=new Date(cur.y,cur.m,d),fut=dt>now&&!(isCurrent(cur.y,cur.m)&&d===now.getDate());
     if(fut)cls+=" future";
     if(isCurrent(cur.y,cur.m)&&d===now.getDate())cls+=" today";
-    h+='<button class="'+cls+'" data-d="'+d+'"'+(e?' data-s="'+e.s+'"':'')+' aria-label="'+d+' '+MONTHS[cur.m]+(e?(e.s?', καούρα '+SEV[e.s].toLowerCase():', χωρίς καούρα, με σημειώσεις'):'')+'">'+d+'</button>';
+    var ok=!e&&cfg.ok&&cfg.ok[k];
+    h+='<button class="'+cls+'" data-d="'+d+'"'+(e?' data-s="'+e.s+'"':ok?' data-s="0"':'')+' aria-label="'+d+' '+MONTHS[cur.m]+(e?(e.s?', καούρα '+SEV[e.s].toLowerCase():', χωρίς καούρα, με σημειώσεις'):ok?', χωρίς καούρα':'')+'">'+d+'</button>';
   }
   $("days").innerHTML=h;
 }
@@ -480,10 +481,11 @@ $("days").addEventListener("click",function(ev){
 function openSheet(d){
   editing=ds(cur.y,cur.m,d);
   var e=data[editing];
-  form={s:e?e.s:null,t:e?e.t.slice():[],y:e&&e.y?e.y.slice():[],f:e&&e.f?e.f.slice():[],p:e&&e.p||0,pt:e&&e.pt!=null?e.pt:null};
+  var okd=!e&&cfg.ok&&cfg.ok[editing];
+  form={s:e?e.s:(okd?0:null),t:e?e.t.slice():[],y:e&&e.y?e.y.slice():[],f:e&&e.f?e.f.slice():[],p:e&&e.p||0,pt:e&&e.pt!=null?e.pt:null};
   $("sh-title").textContent=d+" "+MONTHS[cur.m]+" "+cur.y;
   $("note").value=e?e.n||"":"";
-  $("del").style.display=e?"":"none";
+  $("del").style.display=(e||okd)?"":"none";
   drawForm();
   $("bg").classList.add("open");
 }
