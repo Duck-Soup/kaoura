@@ -173,7 +173,7 @@ textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius
 <section id="v-cal">
 <div class="grid" id="dows"></div>
 <div class="grid" id="days" style="margin-top:6px"></div>
-<div class="legend"><span><i style="background:var(--s1)"></i>Ήπια</span><span><i style="background:var(--s2)"></i>Μέτρια</span><span><i style="background:var(--s3)"></i>Έντονη</span><span><i style="border:2px dashed var(--accent);box-sizing:border-box"></i>Μόνο συμπτώματα</span></div>
+<div class="legend"><span><i style="background:var(--s1)"></i>Ήπια</span><span><i style="background:var(--s2)"></i>Μέτρια</span><span><i style="background:var(--s3)"></i>Έντονη</span><span><i style="border:2px dashed var(--accent);box-sizing:border-box"></i>Χωρίς καούρα (με σημειώσεις)</span></div>
 <p class="hint">Πάτα μια μέρα για να καταχωρίσεις καούρα ή συμπτώματα. Οι μέρες χωρίς χρώμα μετράνε ως μέρες χωρίς καούρα.</p>
 </section>
 <section id="v-sum" hidden></section>
@@ -418,7 +418,7 @@ function renderCal(){
     var dt=new Date(cur.y,cur.m,d),fut=dt>now&&!(isCurrent(cur.y,cur.m)&&d===now.getDate());
     if(fut)cls+=" future";
     if(isCurrent(cur.y,cur.m)&&d===now.getDate())cls+=" today";
-    h+='<button class="'+cls+'" data-d="'+d+'"'+(e?' data-s="'+e.s+'"':'')+' aria-label="'+d+' '+MONTHS[cur.m]+(e?(e.s?', καούρα '+SEV[e.s].toLowerCase():', μόνο συμπτώματα'):'')+'">'+d+'</button>';
+    h+='<button class="'+cls+'" data-d="'+d+'"'+(e?' data-s="'+e.s+'"':'')+' aria-label="'+d+' '+MONTHS[cur.m]+(e?(e.s?', καούρα '+SEV[e.s].toLowerCase():', χωρίς καούρα, με σημειώσεις'):'')+'">'+d+'</button>';
   }
   $("days").innerHTML=h;
 }
