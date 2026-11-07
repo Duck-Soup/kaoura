@@ -334,7 +334,7 @@ function drawForm(){
   $("food").innerHTML=(fl.length||form.f.length)?chips([],fl,form.f,"f"):'<p class="sub" style="margin:0">Γράψε τι έφαγες και πάτα Προσθήκη. Θα το θυμάμαι για τις επόμενες φορές.</p>';
 }
 $("sev").addEventListener("click",function(ev){var b=ev.target.closest("[data-s]");if(!b)return;form.s=+b.getAttribute("data-s");drawForm();});
-document.querySelector(".sheet").addEventListener("click",function(ev){
+$("bg").querySelector(".sheet").addEventListener("click",function(ev){
   var b=ev.target.closest("[data-k]");
   if(b){var kk=b.getAttribute("data-k"),arr=kk==="t"?form.t:kk==="f"?form.f:form.y,v=b.getAttribute("data-v"),i=arr.indexOf(v);if(i>-1)arr.splice(i,1);else arr.push(v);drawForm();return;}
   var r=ev.target.closest("[data-rmk]");if(!r)return;
