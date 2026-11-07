@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Καουροημερολόγιο</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="Καουροημερολόγιο">
+<meta name="theme-color" content="#14a3a6">
+<link rel="icon" href="icon-192.png">
+<style>
+:root{--bg:#eef8f9;--surface:#ffffff;--ink:#1b2340;--muted:#5b6b80;--line:#cfe6ea;--accent:#c2187a;--accent-ink:#ffffff;--leaf:#14a3a6;
+--s1:#f7c6df;--s2:#e3609f;--s3:#a3125e;--s-ink:#3a0a24;--free:#e3f3f5;--grad:linear-gradient(120deg,#14a3a6,#c2187a);--grad-ink:#fff;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);color-scheme:light}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#0e1622;--surface:#172231;--ink:#eaf2f7;--muted:#93a5b8;--line:#26364a;--accent:#ff5aa8;--accent-ink:#2a0616;--leaf:#3cc7c9;--s1:#6e2a4c;--s2:#b0377a;--s3:#e0479a;--s-ink:#fff;--free:#1d2c3d;--grad:linear-gradient(120deg,#1fa9ad,#d6318a);--grad-ink:#fff;color-scheme:dark}}
+:root[data-theme="dark"]{--bg:#0e1622;--surface:#172231;--ink:#eaf2f7;--muted:#93a5b8;--line:#26364a;--accent:#ff5aa8;--accent-ink:#2a0616;--leaf:#3cc7c9;--s1:#6e2a4c;--s2:#b0377a;--s3:#e0479a;--s-ink:#fff;--free:#1d2c3d;--grad:linear-gradient(120deg,#1fa9ad,#d6318a);--grad-ink:#fff;color-scheme:dark}
+*{box-sizing:border-box}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:"Manrope",system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.5}
+main{max-width:480px;margin:0 auto;padding:16px 16px 40px}
+h1{font-size:1.35rem;margin:4px 0 14px;font-weight:700;letter-spacing:-.01em}
+.tabs{display:flex;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:16px}
+.tabs button{flex:1;border:0;background:none;color:var(--muted);font:inherit;font-weight:600;padding:9px;border-radius:9px;cursor:pointer}
+.tabs button[aria-selected="true"]{background:var(--grad);color:var(--grad-ink)}
+.nav{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px}
+.nav b{font-size:1.1rem;text-transform:capitalize}
+.nav button{width:42px;height:42px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1.2rem;cursor:pointer}
+button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.grid{display:grid;grid-template-columns:repeat(7,1fr);gap:6px}
+.dow{text-align:center;font-size:.75rem;color:var(--muted);padding-bottom:2px}
+.day{aspect-ratio:1;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0}
+.day.empty{visibility:hidden}
+.day.future{opacity:.4}
+.day.today{border:2px solid var(--accent);font-weight:700}
+.day[data-s="1"]{background:var(--s1);color:var(--s-ink);border-color:transparent}
+.day[data-s="2"]{background:var(--s2);color:var(--s-ink);border-color:transparent}
+.day[data-s="3"]{background:var(--s3);color:#fff;border-color:transparent}
+.legend{display:flex;gap:14px;flex-wrap:wrap;margin:14px 2px 0;font-size:.82rem;color:var(--muted)}
+.legend i{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:5px;vertical-align:-1px}
+.hint{color:var(--muted);font-size:.88rem;margin-top:12px}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:16px;margin-bottom:12px}
+.big{font-size:3rem;font-weight:800;line-height:1;letter-spacing:-.03em}
+.sub{color:var(--muted);font-size:.9rem;margin-top:4px}
+.stats{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.stats .card{margin:0}
+.stats b{font-size:1.6rem;display:block;letter-spacing:-.02em}
+h2{font-size:1rem;margin:0 0 10px}
+.bar{display:flex;align-items:center;gap:10px;margin:8px 0;font-size:.9rem}
+.bar span:first-child{width:96px;flex:none}
+.bar .track{flex:1;height:10px;background:var(--free);border-radius:6px;overflow:hidden}
+.bar .track i{display:block;height:100%;background:var(--leaf);border-radius:6px}
+.bar span:last-child{width:26px;text-align:right;color:var(--muted)}
+.notes li{margin:6px 0;font-size:.9rem}
+.notes{padding-left:18px;margin:0}
+.sheet-bg{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;justify-content:center;z-index:20}
+.sheet-bg.open{display:flex}
+.sheet{background:var(--surface);width:100%;max-width:480px;border-radius:20px 20px 0 0;padding:20px 18px calc(18px + env(safe-area-inset-bottom,0px));max-height:90%;overflow-y:auto}
+.sheet h2{font-size:1.1rem;margin-bottom:14px}
+.lbl{font-size:.88rem;color:var(--muted);margin:14px 0 6px}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+.opt{border:1.5px solid var(--line);background:var(--bg);color:var(--ink);font:inherit;font-size:.92rem;padding:9px 14px;border-radius:999px;cursor:pointer}
+.opt[aria-pressed="true"]{background:var(--accent);color:var(--accent-ink);border-color:var(--accent)}
+.sev .opt{flex:1;border-radius:12px;text-align:center}
+textarea{width:100%;min-height:64px;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;padding:10px;resize:vertical}
+.actions{display:flex;gap:10px;margin-top:18px}
+.actions button{flex:1;font:inherit;font-weight:700;padding:13px;border-radius:12px;border:0;cursor:pointer}
+.save{background:var(--grad);color:var(--grad-ink)}
+.del{background:var(--free);color:var(--ink)}
+.banner{background:var(--grad);color:var(--grad-ink);border-radius:16px;padding:14px 16px;margin-bottom:14px}
+.banner p{margin:0 0 10px;font-weight:700}
+.banner .row button{font:inherit;font-weight:700;border:0;border-radius:10px;padding:9px 14px;cursor:pointer;background:var(--surface);color:var(--ink)}
+.chipwrap{display:inline-flex;align-items:center;gap:2px}
+.chipwrap .opt{border-top-right-radius:0;border-bottom-right-radius:0;border-right:0}
+.rm{border:1.5px solid var(--line);border-left:0;background:var(--bg);color:var(--muted);font:inherit;padding:9px 11px;border-radius:0 999px 999px 0;cursor:pointer}
+.addrow{display:flex;gap:8px;margin-top:10px}
+.addrow input,.set input[type=time]{flex:1;border:1.5px solid var(--line);border-radius:12px;background:var(--bg);color:var(--ink);font:inherit;padding:9px 12px;min-width:0}
+.addrow button{border:0;border-radius:12px;background:var(--free);color:var(--ink);font:inherit;font-weight:700;padding:9px 14px;cursor:pointer}
+.set label{display:flex;align-items:center;gap:10px;margin:8px 0}
+.set input[type=checkbox]{width:20px;height:20px;accent-color:var(--accent)}
+.set input[type=time]{flex:none}
+.set a{display:inline-block;margin-top:6px;color:var(--accent);font-weight:700}
+.set p{margin:8px 0 0}
+.brand{display:flex;align-items:center;gap:12px;margin:4px 0 14px}
+.brand h1{margin:0}
+.brand p{margin:2px 0 0;color:var(--muted);font-size:.85rem;line-height:1.35}
+.toast{position:fixed;left:50%;bottom:calc(20px + env(safe-area-inset-bottom,0px));transform:translateX(-50%) translateY(20px);background:var(--ink);color:var(--bg);padding:11px 16px;border-radius:12px;font-size:.9rem;opacity:0;pointer-events:none;transition:.25s;z-index:30;max-width:90%;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%)}
+.cancel{background:none;color:var(--muted);flex:0 0 auto!important;padding:13px 10px!important}
+</style>
+</head>
+<body>
+<main>
+<div class="brand"><svg width="44" height="44" viewBox="0 0 40 40" aria-hidden="true" style="flex:none"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#14a3a6"/><stop offset="1" stop-color="#c2187a"/></linearGradient></defs><rect width="40" height="40" rx="12" fill="url(#lg)"/><path d="M20 6c1 5 7 8 7 15a7 7 0 0 1-14 0c0-3 2-5 3-7 1 2 2 3 3 3 0-4-1-7 1-11z" fill="#fff"/><path d="M20 19c0 0-3.2 3.7-3.2 6a3.2 3.2 0 0 0 6.4 0c0-2.3-3.2-6-3.2-6z" fill="#f39a2b"/></svg><div><h1>Καουροημερολόγιο</h1><p id="tag"></p></div></div>
+<div class="tabs" role="tablist">
+<button role="tab" id="t-cal" aria-selected="true">Ημερολόγιο</button>
+<button role="tab" id="t-sum" aria-selected="false">Απολογισμός</button>
+</div>
+<div id="banner"></div>
+<div class="nav">
+<button id="prev" aria-label="Προηγούμενος μήνας">‹</button>
+<b id="title"></b>
+<button id="next" aria-label="Επόμενος μήνας">›</button>
+</div>
+<section id="v-cal">
+<div class="grid" id="dows"></div>
+<div class="grid" id="days" style="margin-top:6px"></div>
+<div class="legend"><span><i style="background:var(--s1)"></i>Ήπια</span><span><i style="background:var(--s2)"></i>Μέτρια</span><span><i style="background:var(--s3)"></i>Έντονη</span></div>
+<p class="hint">Πάτα μια μέρα για να καταχωρίσεις καούρα. Οι μέρες χωρίς χρώμα μετράνε ως μέρες χωρίς καούρα.</p>
+<div class="card set" style="margin-top:16px">
+<h2>Υπενθύμιση καταχώρισης</h2>
+<label><input type="checkbox" id="rem-on"> Να με ρωτάει κάθε μέρα μετά τις</label>
+<label><input type="time" id="rem-time"></label>
+<p class="sub">Όταν ανοίξεις την εφαρμογή μετά από αυτή την ώρα και δεν έχεις καταχωρίσει τη μέρα, θα εμφανιστεί ερώτηση στο πάνω μέρος.</p>
+<p class="sub">Για ειδοποίηση στο κινητό, ακόμα κι όταν η εφαρμογή είναι κλειστή:</p>
+<a id="cal-link" target="_blank" rel="noopener">Πρόσθεσε καθημερινή υπενθύμιση στο Google Calendar</a>
+</div>
+<div class="card set">
+<h2>Αντίγραφο ασφαλείας</h2>
+<p class="sub" id="bk-info" style="margin:0 0 10px"></p>
+<div class="row"><button class="opt" id="bk-save" type="button">Αποθήκευση αντιγράφου</button><button class="opt" id="bk-load" type="button">Επαναφορά</button></div>
+<input type="file" id="bk-file" accept=".json,application/json" hidden>
+<p class="sub">Αν αλλάξει κινητό: αποθηκεύει το αρχείο (π.χ. στο Google Drive), ανοίγει την εφαρμογή στο νέο κινητό και πατάει Επαναφορά.</p>
+</div>
+<div class="card set">
+<h2>Εγκατάσταση στο κινητό</h2>
+<div class="row" id="inst-row" hidden style="margin-bottom:10px"><button class="opt" id="inst-btn" type="button">Εγκατάσταση εφαρμογής</button></div>
+<p class="sub" id="inst-done" hidden style="margin:0 0 6px">Η εφαρμογή είναι εγκατεστημένη.</p>
+<p class="sub" style="margin:0">Στο Chrome: μενού ⋮ και μετά «Προσθήκη στην αρχική οθόνη» (ή «Εγκατάσταση εφαρμογής»). Θα ανοίγει σαν κανονική εφαρμογή, με το λογότυπο.</p>
+</div>
+</section>
+<section id="v-sum" hidden></section>
+</main>
+
+<div class="toast" id="toast" role="status"></div>
+<div class="sheet-bg" id="bg">
+<div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sh-title">
+<h2 id="sh-title"></h2>
+<div class="lbl">Πόσο έντονη ήταν;</div>
+<div class="row sev" id="sev"></div>
+<div class="lbl">Τι μπορεί να τη προκάλεσε;</div>
+<div class="row" id="trig"></div>
+<div class="addrow"><input id="newtrig" maxlength="24" placeholder="Δική σου αιτία, π.χ. σοκολάτα"><button id="addtrig" type="button">Προσθήκη</button></div>
+<div class="lbl">Σημείωση (προαιρετικά)</div>
+<textarea id="note" placeholder="π.χ. μετά το δείπνο, πήρα αντιόξινο"></textarea>
+<div class="actions">
+<button class="cancel" id="cancel">Άκυρο</button>
+<button class="del" id="del">Χωρίς καούρα</button>
+<button class="save" id="save">Αποθήκευση</button>
+</div>
+</div>
+</div>
+
+<script>
+var KEY="kaoura-v1";
+var TRIG=["Καφές","Λιπαρά","Αλκοόλ","Πικάντικο","Στρες","Αργά βράδυ","Μεγάλο γεύμα"];
+var CFGK="kaoura-cfg",cfg={custom:[],ok:{},rem:{on:true,time:"21:00"}};
+try{var c0=JSON.parse(localStorage.getItem(CFGK)||"null");if(c0){cfg.custom=c0.custom||[];cfg.ok=c0.ok||{};cfg.rem=c0.rem||cfg.rem;cfg.last=c0.last||0;}}catch(e){}
+function saveCfg(){try{localStorage.setItem(CFGK,JSON.stringify(cfg));}catch(e){}}
+function esc(s){return String(s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;")}
+var SEV=["","Ήπια","Μέτρια","Έντονη"];
+var MONTHS=["Ιανουάριος","Φεβρουάριος","Μάρτιος","Απρίλιος","Μάιος","Ιούνιος","Ιούλιος","Αύγουστος","Σεπτέμβριος","Οκτώβριος","Νοέμβριος","Δεκέμβριος"];
+var DOW=["Δ","Τ","Τ","Π","Π","Σ","Κ"];
+var data={};
+try{var raw=localStorage.getItem(KEY);if(raw)data=JSON.parse(raw)||{};}catch(e){data={};}
+function persist(){try{localStorage.setItem(KEY,JSON.stringify(data));}catch(e){}}
+var now=new Date();
+var cur={y:now.getFullYear(),m:now.getMonth()};
+var view="cal",editing=null,form={s:0,t:[]};
+function pad(n){return n<10?"0"+n:""+n}
+function ds(y,m,d){return y+"-"+pad(m+1)+"-"+pad(d)}
+function dim(y,m){return new Date(y,m+1,0).getDate()}
+function isCurrent(y,m){return y===now.getFullYear()&&m===now.getMonth()}
+function isFutureMonth(y,m){return y>now.getFullYear()||(y===now.getFullYear()&&m>now.getMonth())}
+function $(id){return document.getElementById(id)}
+$("dows").innerHTML=DOW.map(function(d){return '<div class="dow">'+d+'</div>'}).join("");
+
+function render(){
+  $("title").textContent=MONTHS[cur.m]+" "+cur.y;
+  $("v-cal").hidden=view!=="cal";
+  $("v-sum").hidden=view!=="sum";
+  $("t-cal").setAttribute("aria-selected",view==="cal");
+  $("t-sum").setAttribute("aria-selected",view==="sum");
+  if(view==="cal")renderCal();else renderSum();
+  renderBanner();
+}
+function todayKey(){var n=new Date();return ds(n.getFullYear(),n.getMonth(),n.getDate())}
+function renderBanner(){
+  var b=$("banner"),n=new Date(),k=todayKey();
+  var hm=pad(n.getHours())+":"+pad(n.getMinutes());
+  if(!cfg.rem.on||data[k]||cfg.ok[k]||hm<cfg.rem.time){b.innerHTML="";return;}
+  b.innerHTML='<div class="banner" role="status"><p>Είχες καούρα σήμερα;</p><div class="row"><button id="b-yes">Ναι, καταχώριση</button><button id="b-no">Όχι, καμία</button></div></div>';
+  $("b-yes").onclick=function(){now=new Date();cur={y:now.getFullYear(),m:now.getMonth()};view="cal";render();openSheet(now.getDate());};
+  $("b-no").onclick=function(){cfg.ok[k]=1;saveCfg();renderBanner();toast("Τέλεια, μια ήρεμη μέρα!");};
+}
+function calLink(){
+  var t=cfg.rem.time.replace(":",""),n=new Date(),d=n.getFullYear()+pad(n.getMonth()+1)+pad(n.getDate());
+  var h=+cfg.rem.time.slice(0,2),m=+cfg.rem.time.slice(3,5),e=new Date(2000,0,1,h,m+15);
+  var end=pad(e.getHours())+pad(e.getMinutes());
+  $("cal-link").href="https://calendar.google.com/calendar/render?action=TEMPLATE&text="+encodeURIComponent("Καταχώριση καούρας")+"&details="+encodeURIComponent("Άνοιξε το ημερολόγιο καούρας και σημείωσε τη σημερινή μέρα.")+"&dates="+d+"T"+t+"00/"+d+"T"+end+"00&recur="+encodeURIComponent("RRULE:FREQ=DAILY");
+}
+$("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();
+$("rem-on").onchange=function(){cfg.rem.on=this.checked;saveCfg();renderBanner();};
+$("rem-time").onchange=function(){if(this.value){cfg.rem.time=this.value;saveCfg();calLink();renderBanner();}};
+setInterval(renderBanner,60000);
+function toast(m){var t=$("toast");t.textContent=m;t.classList.add("show");clearTimeout(toast.h);toast.h=setTimeout(function(){t.classList.remove("show")},3200);}
+var PH=["Ολυμπία, το Gaviscon είναι εδώ για σένα.","Μία μέρα τη φορά. Το Gaviscon είναι δίπλα σου.","Η καούρα περνάει. Το Gaviscon είναι εδώ.","Σημείωσε, δες το μοτίβο, φρόντισε τον εαυτό σου.","Όταν η μέρα δεν πάει καλά, το Gaviscon είναι εκεί για σένα.","Κάθε καταχώριση σε βοηθά να καταλάβεις τι σου φταίει."];
+$("tag").textContent=PH[Math.floor(Date.now()/864e5)%PH.length];
+function backupInfo(){
+  var n=Object.keys(data).length,el=$("bk-info");
+  if(cfg.last)el.textContent="Τελευταίο αντίγραφο: "+new Date(cfg.last).toLocaleDateString("el-GR")+".";
+  else el.textContent=n?"Δεν έχεις κάνει ακόμα αντίγραφο ασφαλείας. Τα δεδομένα σου είναι μόνο σε αυτό το κινητό.":"Τα δεδομένα σου μένουν σε αυτό το κινητό. Κάνε αντίγραφο πού και πού.";
+}
+backupInfo();
+$("bk-save").onclick=async function(){
+  var dl=null;
+  try{if(window.claude&&claude.use)dl=await claude.use("downloads");}catch(e){}
+  var fn="kaoura-backup-"+todayKey()+".json",js=JSON.stringify({v:1,data:data,custom:cfg.custom,rem:cfg.rem});
+  try{
+    if(dl)await dl.save({filename:fn,data:js});
+    else{
+      var u=URL.createObjectURL(new Blob([js],{type:"application/json"})),a=document.createElement("a");
+      a.href=u;a.download=fn;document.body.appendChild(a);a.click();a.remove();setTimeout(function(){URL.revokeObjectURL(u)},2000);
+    }
+    cfg.last=Date.now();saveCfg();backupInfo();toast("Το αντίγραφο αποθηκεύτηκε.");
+  }catch(e){if(!e||e.code!=="declined")toast("Το αντίγραφο δεν αποθηκεύτηκε.");}
+};
+$("bk-load").onclick=function(){$("bk-file").click()};
+$("bk-file").onchange=function(){
+  var f=this.files&&this.files[0],inp=this;if(!f)return;
+  var r=new FileReader();
+  r.onload=function(){
+    try{
+      var o=JSON.parse(r.result),d=o.data||{},n=0,re=/^\d{4}-\d{2}-\d{2}$/;
+      Object.keys(d).forEach(function(k){
+        var e=d[k];
+        if(re.test(k)&&e&&e.s>=1&&e.s<=3&&Array.isArray(e.t)){data[k]={s:+e.s,t:e.t.map(String),n:String(e.n||"")};n++;}
+      });
+      (o.custom||[]).forEach(function(c){c=String(c);if(cfg.custom.indexOf(c)<0&&TRIG.indexOf(c)<0)cfg.custom.push(c)});
+      if(o.rem&&o.rem.time){cfg.rem={on:!!o.rem.on,time:String(o.rem.time)};$("rem-on").checked=cfg.rem.on;$("rem-time").value=cfg.rem.time;calLink();}
+      persist();saveCfg();render();toast("Επαναφέρθηκαν "+n+" μέρες.");
+    }catch(e){toast("Το αρχείο δεν φαίνεται σωστό.");}
+    inp.value="";
+  };
+  r.readAsText(f);
+};
+function renderCal(){
+  var first=(new Date(cur.y,cur.m,1).getDay()+6)%7,n=dim(cur.y,cur.m),h="";
+  for(var i=0;i<first;i++)h+='<button class="day empty" tabindex="-1" aria-hidden="true"></button>';
+  for(var d=1;d<=n;d++){
+    var k=ds(cur.y,cur.m,d),e=data[k],cls="day";
+    var dt=new Date(cur.y,cur.m,d),fut=dt>now&&!(isCurrent(cur.y,cur.m)&&d===now.getDate());
+    if(fut)cls+=" future";
+    if(isCurrent(cur.y,cur.m)&&d===now.getDate())cls+=" today";
+    h+='<button class="'+cls+'" data-d="'+d+'"'+(e?' data-s="'+e.s+'"':'')+' aria-label="'+d+' '+MONTHS[cur.m]+(e?', καούρα '+SEV[e.s].toLowerCase():'')+'">'+d+'</button>';
+  }
+  $("days").innerHTML=h;
+}
+$("days").addEventListener("click",function(ev){
+  var b=ev.target.closest("[data-d]");if(!b)return;
+  openSheet(+b.getAttribute("data-d"));
+});
+function openSheet(d){
+  editing=ds(cur.y,cur.m,d);
+  var e=data[editing];
+  form={s:e?e.s:0,t:e?e.t.slice():[]};
+  $("sh-title").textContent=d+" "+MONTHS[cur.m]+" "+cur.y;
+  $("note").value=e?e.n||"":"";
+  $("del").style.display=e?"":"none";
+  drawForm();
+  $("bg").classList.add("open");
+}
+function drawForm(){
+  $("sev").innerHTML=[1,2,3].map(function(s){return '<button class="opt" data-s="'+s+'" aria-pressed="'+(form.s===s)+'">'+SEV[s]+'</button>'}).join("");
+  var all=TRIG.concat(cfg.custom);
+  form.t.forEach(function(t){if(all.indexOf(t)<0)all.push(t)});
+  $("trig").innerHTML=all.map(function(t){
+    var b='<button class="opt" data-t="'+esc(t)+'" aria-pressed="'+(form.t.indexOf(t)>-1)+'">'+esc(t)+'</button>';
+    if(cfg.custom.indexOf(t)>-1)return '<span class="chipwrap">'+b+'<button class="rm" data-rm="'+esc(t)+'" aria-label="Αφαίρεση της αιτίας '+esc(t)+'">×</button></span>';
+    return b;
+  }).join("");
+}
+$("sev").addEventListener("click",function(ev){var b=ev.target.closest("[data-s]");if(!b)return;form.s=+b.getAttribute("data-s");drawForm();});
+$("trig").addEventListener("click",function(ev){var b=ev.target.closest("[data-t]");if(!b)return;var t=b.getAttribute("data-t"),i=form.t.indexOf(t);if(i>-1)form.t.splice(i,1);else form.t.push(t);drawForm();});
+$("trig").addEventListener("click",function(ev){
+  var r=ev.target.closest("[data-rm]");if(!r)return;
+  var t=r.getAttribute("data-rm");
+  cfg.custom=cfg.custom.filter(function(x){return x!==t});
+  form.t=form.t.filter(function(x){return x!==t});
+  saveCfg();drawForm();
+});
+function addTrig(){
+  var v=$("newtrig").value.trim();if(!v)return;
+  var low=v.toLowerCase(),all=TRIG.concat(cfg.custom),found=null;
+  all.forEach(function(x){if(x.toLowerCase()===low)found=x});
+  if(!found){cfg.custom.push(v);found=v;saveCfg();}
+  if(form.t.indexOf(found)<0)form.t.push(found);
+  $("newtrig").value="";drawForm();
+}
+$("addtrig").onclick=addTrig;
+$("newtrig").addEventListener("keydown",function(ev){if(ev.key==="Enter"){ev.preventDefault();addTrig();}});
+function closeSheet(){$("bg").classList.remove("open");editing=null}
+$("cancel").onclick=closeSheet;
+$("bg").addEventListener("click",function(ev){if(ev.target===$("bg"))closeSheet()});
+$("save").onclick=function(){
+  if(!form.s)form.s=1;
+  data[editing]={s:form.s,t:form.t,n:$("note").value.trim()};
+  persist();closeSheet();render();
+  toast("Καταχωρήθηκε. Το Gaviscon είναι εδώ για σένα.");
+};
+$("del").onclick=function(){delete data[editing];persist();closeSheet();render();};
+
+function stats(y,m){
+  var n=dim(y,m),span=isCurrent(y,m)?now.getDate():(isFutureMonth(y,m)?0:n);
+  var cnt=0,sev=[0,0,0,0],trig={},run=0,best=0,sevSum=0;
+  for(var d=1;d<=span;d++){
+    var e=data[ds(y,m,d)];
+    if(e){cnt++;sev[e.s]++;sevSum+=e.s;run=0;e.t.forEach(function(t){trig[t]=(trig[t]||0)+1});}
+    else{run++;if(run>best)best=run;}
+  }
+  return {span:span,cnt:cnt,free:span-cnt,sev:sev,trig:trig,best:best,avg:cnt?sevSum/cnt:0};
+}
+function renderSum(){
+  var s=stats(cur.y,cur.m),el=$("v-sum");
+  if(!s.span){el.innerHTML='<div class="card"><p class="sub">Δεν υπάρχουν δεδομένα για αυτόν τον μήνα ακόμα.</p></div>';return;}
+  var pm=cur.m===0?11:cur.m-1,py=cur.m===0?cur.y-1:cur.y,p=stats(py,pm);
+  var hasPrev=false;for(var d=1;d<=dim(py,pm);d++){if(data[ds(py,pm,d)]){hasPrev=true;break;}}
+  var pct=Math.round(s.cnt/s.span*100);
+  var h='<div class="card"><div class="big">'+s.cnt+'</div><div class="sub">'+(s.cnt===1?'μέρα':'μέρες')+' με καούρα σε '+s.span+' ('+pct+'%)'+(isCurrent(cur.y,cur.m)?' μέχρι σήμερα':'')+'</div></div>';
+  h+='<div class="stats"><div class="card"><b>'+s.free+'</b><span class="sub">μέρες χωρίς καούρα</span></div><div class="card"><b>'+s.best+'</b><span class="sub">μεγαλύτερο διάστημα χωρίς</span></div></div>';
+  h+='<div class="card"><h2>Ένταση</h2>';
+  [1,2,3].forEach(function(i){h+=bar(SEV[i],s.sev[i],Math.max(s.cnt,1));});
+  h+='</div>';
+  var tk=Object.keys(s.trig).sort(function(a,b){return s.trig[b]-s.trig[a]});
+  h+='<div class="card"><h2>Πιθανές αιτίες</h2>';
+  if(tk.length){tk.forEach(function(t){h+=bar(t,s.trig[t],s.cnt)});}else{h+='<p class="sub" style="margin:0">Δεν έχουν καταχωριστεί αιτίες.</p>';}
+  h+='</div>';
+  var notes=[];
+  if(hasPrev&&!isCurrent(cur.y,cur.m)||hasPrev&&isCurrent(cur.y,cur.m)){
+    var diff=s.cnt-p.cnt;
+    if(isCurrent(cur.y,cur.m)){var pr=Math.round(p.cnt/dim(py,pm)*100);notes.push('Τον προηγούμενο μήνα η καούρα εμφανίστηκε στο '+pr+'% των ημερών, φέτος μέχρι τώρα στο '+pct+'%.');}
+    else if(diff<0)notes.push('Καλύτερα από τον προηγούμενο μήνα: '+(-diff)+' λιγότερες μέρες με καούρα.');
+    else if(diff>0)notes.push('Χειρότερα από τον προηγούμενο μήνα: '+diff+' περισσότερες μέρες με καούρα.');
+    else notes.push('Ίδιος αριθμός ημερών με τον προηγούμενο μήνα.');
+  }
+  if(tk.length)notes.push('Η πιο συχνή αιτία που σημειώθηκε: '+tk[0].toLowerCase()+' ('+s.trig[tk[0]]+' φορές).');
+  if(s.cnt)notes.push('Μέση ένταση: '+(s.avg<1.67?'ήπια':s.avg<2.34?'μέτρια':'έντονη')+'.');
+  if(s.cnt>=8||pct>=30)notes.push('Η καούρα εμφανίζεται συχνά. Αν συνεχίσει, αξίζει να το συζητήσετε με γιατρό.');
+  if(notes.length)h+='<div class="card"><h2>Συμπεράσματα</h2><ul class="notes">'+notes.map(function(n){return '<li>'+n+'</li>'}).join("")+'</ul></div>';
+  el.innerHTML=h;
+}
+function bar(l,v,max){return '<div class="bar"><span>'+l+'</span><span class="track"><i style="width:'+Math.round(v/max*100)+'%"></i></span><span>'+v+'</span></div>'}
+$("prev").onclick=function(){cur.m--;if(cur.m<0){cur.m=11;cur.y--}render()};
+$("next").onclick=function(){cur.m++;if(cur.m>11){cur.m=0;cur.y++}render()};
+$("t-cal").onclick=function(){view="cal";render()};
+$("t-sum").onclick=function(){view="sum";render()};
+render();
+// Εγκατάσταση σαν εφαρμογή (PWA)
+if("serviceWorker" in navigator&&window.isSecureContext){navigator.serviceWorker.register("sw.js").catch(function(){});}
+var instEvt=null;
+function isStandalone(){return (window.matchMedia&&matchMedia("(display-mode: standalone)").matches)||navigator.standalone===true}
+if(isStandalone())$("inst-done").hidden=false;
+window.addEventListener("beforeinstallprompt",function(e){e.preventDefault();instEvt=e;$("inst-row").hidden=false;});
+$("inst-btn").onclick=async function(){if(!instEvt)return;instEvt.prompt();try{await instEvt.userChoice;}catch(e){}instEvt=null;$("inst-row").hidden=true;};
+window.addEventListener("appinstalled",function(){$("inst-row").hidden=true;$("inst-done").hidden=false;toast("Το Καουροημερολόγιο εγκαταστάθηκε!");});
+</script>
+</body>
+</html>
