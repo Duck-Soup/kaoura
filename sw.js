@@ -1,5 +1,5 @@
-// Καουροημερολόγιο - service worker: κρατά την εφαρμογή διαθέσιμη χωρίς ίντερνετ
-var CACHE = "kaoura-v38";
+// Καουρολόγιο - service worker: κρατά την εφαρμογή διαθέσιμη χωρίς ίντερνετ
+var CACHE = "kaoura-v39";
 var FILES = ["./", "index.html", "manifest.webmanifest", "icon-192.png", "icon-512.png", "icon-maskable-512.png", "apple-touch-icon.png", "fb.js", "badge-96.png"];
 self.addEventListener("install", function (e) {
   e.waitUntil(caches.open(CACHE).then(function (c) { return c.addAll(FILES); }).then(function () { return self.skipWaiting(); }));
@@ -29,7 +29,7 @@ self.addEventListener("push", function (e) {
     }));
     return;
   }
-  e.waitUntil(self.registration.showNotification(d.title || "Καουροημερολόγιο", {
+  e.waitUntil(self.registration.showNotification(d.title || "Καουρολόγιο", {
     body: d.body || "Είχες καούρα σήμερα; Πάτα για να το σημειώσεις.",
     icon: "icon-192.png", badge: "badge-96.png", tag: "kaoura-daily", renotify: true,
     data: { day: d.day || "" },
